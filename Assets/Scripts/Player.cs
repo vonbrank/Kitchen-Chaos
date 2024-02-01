@@ -1,15 +1,105 @@
+using System;
 using UnityEngine;
 
 namespace DefaultNamespace
 {
     public class Player : MonoBehaviour
     {
+        public static Player Instance { get; private set; }
+
         [SerializeField] private float moveSpeed = 10f;
         [SerializeField] private float rotateSpeed = 10f;
 
         [SerializeField] private InputManager inputManager;
+        [SerializeField] private LayerMask countersLayerMask;
+
+        private Vector3 lastInteractDir;
+        private ClearCounter selectedCounter;
+
+        public event EventHandler<SelectedCounterChangedEventArgs> OnSelectedCounterChanged;
+
+        public class SelectedCounterChangedEventArgs : EventArgs
+        {
+            public ClearCounter SelectedCounter;
+        }
+
+        private void Awake()
+        {
+            if (Instance is not null)
+            {
+                Debug.LogError("There is more than one instance of Player.");
+            }
+
+            Instance = this;
+        }
+
+        private void OnEnable()
+        {
+            inputManager.OnInteractAction += OnInteractAction;
+        }
+
+        private void OnDisable()
+        {
+            inputManager.OnInteractAction -= OnInteractAction;
+        }
+
 
         private void Update()
+        {
+            HandleMovement();
+            HandleInteractions();
+        }
+
+        public bool IsWalking { get; private set; }
+
+        private void HandleInteractions()
+        {
+            var inputVector = inputManager.GetMovementVectorNormalized();
+
+            var moveDir = new Vector3(inputVector.x, 0, inputVector.y);
+
+            if (moveDir != Vector3.zero)
+            {
+                lastInteractDir = moveDir;
+            }
+
+            float interactDistance = 2f;
+            if (Physics.Raycast(transform.position, lastInteractDir,
+                    out RaycastHit raycastHit, interactDistance,
+                    countersLayerMask))
+            {
+                if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+                {
+                    if (clearCounter != selectedCounter)
+                    {
+                        SetSelectedCounter(clearCounter);
+                    }
+                }
+                else
+                {
+                    SetSelectedCounter(null);
+                }
+            }
+            else
+            {
+                SetSelectedCounter(null);
+            }
+
+            if (selectedCounter is not null)
+            {
+                // Debug.Log($"selected counter = {selectedCounter.transform}");
+            }
+        }
+
+        private void OnInteractAction(object sender, System.EventArgs e)
+        {
+            if (selectedCounter is not null)
+            {
+                selectedCounter.Interact();
+            }
+        }
+
+        private void HandleMovement()
         {
             var inputVector = inputManager.GetMovementVectorNormalized();
 
@@ -66,6 +156,13 @@ namespace DefaultNamespace
             transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
         }
 
-        public bool IsWalking { get; private set; }
+        private void SetSelectedCounter(ClearCounter clearCounter)
+        {
+            selectedCounter = clearCounter;
+            OnSelectedCounterChanged?.Invoke(this, new SelectedCounterChangedEventArgs
+            {
+                SelectedCounter = selectedCounter
+            });
+        }
     }
 }
