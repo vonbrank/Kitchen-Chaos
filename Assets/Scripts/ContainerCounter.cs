@@ -13,9 +13,8 @@ namespace DefaultNamespace
         {
             if (!player.HasKitchenObject())
             {
-                var kitchenObjectTransform = Instantiate(kitchenObjectItem.Prefab);
-                var newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-                newKitchenObject.SetKitchenObjectParent(player);
+                KitchenObject.SpawnKitchenObject(kitchenObjectItem, player);
+
                 OnPlayerGrabObject?.Invoke(this, EventArgs.Empty);
             }
         }

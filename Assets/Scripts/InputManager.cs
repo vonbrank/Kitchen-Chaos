@@ -7,6 +7,7 @@ namespace DefaultNamespace
     public class InputManager : MonoBehaviour
     {
         public event EventHandler OnInteractAction;
+        public event EventHandler OnInteractAlternateAction;
 
         private PlayerInputActions playerInputActions;
 
@@ -18,16 +19,23 @@ namespace DefaultNamespace
         private void OnEnable()
         {
             playerInputActions.Player.Interact.performed += InteractPerformed;
+            playerInputActions.Player.InteractAlternate.performed += InteractAlternatePerformed;
         }
 
         private void OnDisable()
         {
             playerInputActions.Player.Interact.performed -= InteractPerformed;
+            playerInputActions.Player.InteractAlternate.performed -= InteractAlternatePerformed;
         }
 
         private void InteractPerformed(InputAction.CallbackContext context)
         {
             OnInteractAction?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void InteractAlternatePerformed(InputAction.CallbackContext context)
+        {
+            OnInteractAlternateAction?.Invoke(this, EventArgs.Empty);
         }
 
         private void Start()

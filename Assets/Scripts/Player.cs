@@ -35,12 +35,14 @@ namespace DefaultNamespace
 
         private void OnEnable()
         {
-            inputManager.OnInteractAction += OnInteractAction;
+            inputManager.OnInteractAction += HandleInteractAction;
+            inputManager.OnInteractAlternateAction += HandleInteractAlternateAction;
         }
 
         private void OnDisable()
         {
-            inputManager.OnInteractAction -= OnInteractAction;
+            inputManager.OnInteractAction -= HandleInteractAction;
+            inputManager.OnInteractAlternateAction -= HandleInteractAlternateAction;
         }
 
 
@@ -91,11 +93,20 @@ namespace DefaultNamespace
             }
         }
 
-        private void OnInteractAction(object sender, System.EventArgs e)
+
+        private void HandleInteractAction(object sender, EventArgs e)
         {
             if (selectedCounter is not null)
             {
                 selectedCounter.Interact(this);
+            }
+        }
+
+        private void HandleInteractAlternateAction(object sender, EventArgs e)
+        {
+            if (selectedCounter is not null)
+            {
+                selectedCounter.InteractAlternate(this);
             }
         }
 

@@ -30,5 +30,21 @@ namespace DefaultNamespace
             transform.parent = kitchenObjectParent.KitchenObjectFollowTransform;
             transform.localPosition = Vector3.zero;
         }
+
+        public void DestroySelf()
+        {
+            kitchenObjectParent.ClearKitchenObject();
+
+            Destroy(gameObject);
+        }
+
+        public static KitchenObject SpawnKitchenObject(KitchenObjectItem kitchenObjectItem,
+            IKitchenObjectParent kitchenObjectParent)
+        {
+            var kitchenObjectTransform = Instantiate(kitchenObjectItem.Prefab);
+            var kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
+            kitchenObject.SetKitchenObjectParent(kitchenObjectParent);
+            return kitchenObject;
+        }
     }
 }
