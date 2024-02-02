@@ -3,20 +3,44 @@ using UnityEngine.Serialization;
 
 namespace DefaultNamespace
 {
-    public class ClearCounter : MonoBehaviour
+    public class ClearCounter : MonoBehaviour, IKitchenObjectParent
     {
-        [FormerlySerializedAs("kitchenObject")] [SerializeField]
-        private KitchenObjectItem kitchenObjectItem;
+        [SerializeField] private KitchenObjectItem kitchenObjectItem;
 
         [SerializeField] private Transform counterTopPoint;
+        public Transform KitchenObjectFollowTransform => counterTopPoint;
 
-        public void Interact()
+        private KitchenObject kitchenObject;
+
+        public KitchenObject KitchenObject => kitchenObject;
+
+        public void Interact(Player player)
         {
-            var kitchenObjectTransform = Instantiate(kitchenObjectItem.Prefab, counterTopPoint);
-            kitchenObjectTransform.localPosition = Vector3.zero;
+            if (kitchenObject is null)
+            {
+                var kitchenObjectTransform = Instantiate(kitchenObjectItem.Prefab, counterTopPoint);
+                var newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
+                newKitchenObject.SetKitchenObjectParent(this);
+            }
+            else
+            {
+                kitchenObject.SetKitchenObjectParent(player);
+            }
+        }
 
-            KitchenObject kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-            Debug.Log($"kitchen object spawned {kitchenObject.transform}");
+        public void SetKitchenObject(KitchenObject kitchenObject)
+        {
+            this.kitchenObject = kitchenObject;
+        }
+
+        public void ClearKitchenObject()
+        {
+            kitchenObject = null;
+        }
+
+        public bool HasKitchenObject()
+        {
+            return kitchenObject is not null;
         }
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DefaultNamespace
 {
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IKitchenObjectParent
     {
         public static Player Instance { get; private set; }
 
@@ -95,7 +95,7 @@ namespace DefaultNamespace
         {
             if (selectedCounter is not null)
             {
-                selectedCounter.Interact();
+                selectedCounter.Interact(this);
             }
         }
 
@@ -163,6 +163,26 @@ namespace DefaultNamespace
             {
                 SelectedCounter = selectedCounter
             });
+        }
+
+        [SerializeField] private Transform kitchenObjectHoldPoint;
+        private KitchenObject kitchenObject;
+
+        public Transform KitchenObjectFollowTransform => kitchenObjectHoldPoint;
+
+        public void SetKitchenObject(KitchenObject kitchenObject)
+        {
+            this.kitchenObject = kitchenObject;
+        }
+
+        public void ClearKitchenObject()
+        {
+            kitchenObject = null;
+        }
+
+        public bool HasKitchenObject()
+        {
+            return kitchenObject is not null;
         }
     }
 }
