@@ -5,8 +5,8 @@ namespace DefaultNamespace
 {
     public class SelectedCounterVisual : MonoBehaviour
     {
-        [SerializeField] private ClearCounter clearCounter;
-        [SerializeField] private GameObject visualGameObject;
+        [SerializeField] private BaseCounter baseCounter;
+        [SerializeField] private GameObject[] visualGameObjects;
 
         private void OnEnable()
         {
@@ -20,7 +20,7 @@ namespace DefaultNamespace
 
         private void HandleSelectedCounterChange(object sender, Player.SelectedCounterChangedEventArgs e)
         {
-            if (e.SelectedCounter == clearCounter)
+            if (e.BaseCounter == baseCounter)
             {
                 Show();
             }
@@ -32,12 +32,18 @@ namespace DefaultNamespace
 
         private void Show()
         {
-            visualGameObject.SetActive(true);
+            foreach (var gameObject in visualGameObjects)
+            {
+                gameObject.SetActive(true);
+            }
         }
 
         private void Hide()
         {
-            visualGameObject.SetActive(false);
+            foreach (var gameObject in visualGameObjects)
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 }

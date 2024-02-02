@@ -14,13 +14,13 @@ namespace DefaultNamespace
         [SerializeField] private LayerMask countersLayerMask;
 
         private Vector3 lastInteractDir;
-        private ClearCounter selectedCounter;
+        private BaseCounter selectedCounter;
 
         public event EventHandler<SelectedCounterChangedEventArgs> OnSelectedCounterChanged;
 
         public class SelectedCounterChangedEventArgs : EventArgs
         {
-            public ClearCounter SelectedCounter;
+            public BaseCounter BaseCounter;
         }
 
         private void Awake()
@@ -68,11 +68,11 @@ namespace DefaultNamespace
                     out RaycastHit raycastHit, interactDistance,
                     countersLayerMask))
             {
-                if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+                if (raycastHit.transform.TryGetComponent(out BaseCounter baseCounter))
                 {
-                    if (clearCounter != selectedCounter)
+                    if (baseCounter != selectedCounter)
                     {
-                        SetSelectedCounter(clearCounter);
+                        SetSelectedCounter(baseCounter);
                     }
                 }
                 else
@@ -156,12 +156,12 @@ namespace DefaultNamespace
             transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
         }
 
-        private void SetSelectedCounter(ClearCounter clearCounter)
+        private void SetSelectedCounter(BaseCounter baseCounter)
         {
-            selectedCounter = clearCounter;
+            selectedCounter = baseCounter;
             OnSelectedCounterChanged?.Invoke(this, new SelectedCounterChangedEventArgs
             {
-                SelectedCounter = selectedCounter
+                BaseCounter = selectedCounter
             });
         }
 
