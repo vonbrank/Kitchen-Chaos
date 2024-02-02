@@ -167,6 +167,7 @@ namespace DefaultNamespace
 
         [SerializeField] private Transform kitchenObjectHoldPoint;
         private KitchenObject kitchenObject;
+        public KitchenObject KitchenObject => kitchenObject;
 
         public Transform KitchenObjectFollowTransform => kitchenObjectHoldPoint;
 

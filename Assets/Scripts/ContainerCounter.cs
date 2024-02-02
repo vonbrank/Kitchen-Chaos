@@ -11,10 +11,13 @@ namespace DefaultNamespace
 
         public override void Interact(Player player)
         {
-            var kitchenObjectTransform = Instantiate(kitchenObjectItem.Prefab);
-            var newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-            newKitchenObject.SetKitchenObjectParent(player);
-            OnPlayerGrabObject?.Invoke(this, EventArgs.Empty);
+            if (!player.HasKitchenObject())
+            {
+                var kitchenObjectTransform = Instantiate(kitchenObjectItem.Prefab);
+                var newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
+                newKitchenObject.SetKitchenObjectParent(player);
+                OnPlayerGrabObject?.Invoke(this, EventArgs.Empty);
+            }
         }
     }
 }
