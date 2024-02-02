@@ -104,6 +104,7 @@ namespace DefaultNamespace
             var inputVector = inputManager.GetMovementVectorNormalized();
 
             var moveDir = new Vector3(inputVector.x, 0, inputVector.y);
+            transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
 
             float moveDistance = moveSpeed * Time.deltaTime;
             float playerRadius = 0.7f;
@@ -141,9 +142,6 @@ namespace DefaultNamespace
                     {
                         moveDir = moveDirZ;
                     }
-                    else
-                    {
-                    }
                 }
             }
 
@@ -153,7 +151,6 @@ namespace DefaultNamespace
             }
 
             IsWalking = moveDir != Vector3.zero;
-            transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
         }
 
         private void SetSelectedCounter(BaseCounter baseCounter)
