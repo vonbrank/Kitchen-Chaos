@@ -1,8 +1,10 @@
 using System;
+using DefaultNamespace;
+using ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DefaultNamespace
+namespace Counters
 {
     public class CuttingCounter : BaseCounter
     {

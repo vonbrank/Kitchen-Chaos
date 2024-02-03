@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace ScriptableObjects
 {
     [CreateAssetMenu(menuName = "Kitchen Chaos/Cutting Recipe")]
     public class CuttingRecipe : ScriptableObject

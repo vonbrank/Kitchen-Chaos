@@ -1,6 +1,7 @@
+using DefaultNamespace;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Counters
 {
     public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     {

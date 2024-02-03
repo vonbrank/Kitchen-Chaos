@@ -1,7 +1,9 @@
 using System;
+using DefaultNamespace;
+using ScriptableObjects;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Counters
 {
     public class ContainerCounter : BaseCounter
     {

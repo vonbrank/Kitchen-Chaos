@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Counters
 {
     public class CuttingCounterVisual : MonoBehaviour
     {
