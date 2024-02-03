@@ -7,9 +7,21 @@ namespace DefaultNamespace
 {
     public class ProgressBarUI : MonoBehaviour
     {
-        [SerializeField] private CuttingCounter cuttingCounter;
+        [SerializeField] private GameObject hasProgressGameObject;
         [SerializeField] private Image barImage;
         [SerializeField] private GameObject[] visualGameObjects;
+
+        private IHasProgress hasProgress;
+
+        private void Awake()
+        {
+            hasProgress = hasProgressGameObject.GetComponent<IHasProgress>();
+            if (hasProgress is null)
+            {
+                Debug.LogError(
+                    $"Game Object {hasProgressGameObject} does not have a component that implements IHasProgress.");
+            }
+        }
 
         private void Start()
         {
@@ -20,19 +32,19 @@ namespace DefaultNamespace
 
         private void OnEnable()
         {
-            cuttingCounter.OnProgressChanged += HandleProgressChanged;
+            hasProgress.OnProgressChanged += HandleProgressChanged;
         }
 
         private void OnDisable()
         {
-            cuttingCounter.OnProgressChanged -= HandleProgressChanged;
+            hasProgress.OnProgressChanged -= HandleProgressChanged;
         }
 
-        private void HandleProgressChanged(object sender, CuttingCounter.ProgressChangedEventArgs eventArgs)
+        private void HandleProgressChanged(object sender, IHasProgress.ProgressChangedEventArgs eventArgs)
         {
             barImage.fillAmount = eventArgs.progressNormalized;
 
-            if (eventArgs.progressNormalized == 0f || eventArgs.progressNormalized == 1f)
+            if (eventArgs.progressNormalized <= 0f || eventArgs.progressNormalized >= 1f)
             {
                 Hide();
             }

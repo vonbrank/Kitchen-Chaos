@@ -6,14 +6,9 @@ using UnityEngine.Serialization;
 
 namespace Counters
 {
-    public class CuttingCounter : BaseCounter
+    public class CuttingCounter : BaseCounter, IHasProgress
     {
-        public event EventHandler<ProgressChangedEventArgs> OnProgressChanged;
-
-        public class ProgressChangedEventArgs : EventArgs
-        {
-            public float progressNormalized;
-        }
+        public event EventHandler<IHasProgress.ProgressChangedEventArgs> OnProgressChanged;
 
         public event EventHandler OnCut;
 
@@ -103,7 +98,7 @@ namespace Counters
         {
             CuttingRecipe cuttingRecipe = GetCuttingRecipeFromInput(KitchenObject.KitchenObjectItem);
             cuttingProgress = newProgress;
-            OnProgressChanged?.Invoke(this, new ProgressChangedEventArgs
+            OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs()
             {
                 progressNormalized = (float)cuttingProgress / cuttingRecipe.maxCuttingProgress
             });
