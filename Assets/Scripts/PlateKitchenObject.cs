@@ -18,6 +18,8 @@ namespace DefaultNamespace
 
         private List<KitchenObjectItem> kitchenObjectItems = new List<KitchenObjectItem>();
 
+        public IReadOnlyList<KitchenObjectItem> KitchenObjectItems => kitchenObjectItems;
+
         public bool TryAddIngredient(KitchenObjectItem kitchenObjectItem)
         {
             if (!validKitchenObjectItems.Contains(kitchenObjectItem))
