@@ -14,6 +14,20 @@ namespace Counters
             {
                 if (player.HasKitchenObject())
                 {
+                    if (player.KitchenObject is PlateKitchenObject playerPlateKitchenObject)
+                    {
+                        if (playerPlateKitchenObject.TryAddIngredient(KitchenObject.KitchenObjectItem))
+                        {
+                            KitchenObject.DestroySelf();
+                        }
+                    }
+                    else if (KitchenObject is PlateKitchenObject plateKitchenObject)
+                    {
+                        if (plateKitchenObject.TryAddIngredient(player.KitchenObject.KitchenObjectItem))
+                        {
+                            player.KitchenObject.DestroySelf();
+                        }
+                    }
                 }
                 else
                 {

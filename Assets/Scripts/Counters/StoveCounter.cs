@@ -40,6 +40,15 @@ namespace Counters
             {
                 if (player.HasKitchenObject())
                 {
+                    if (player.KitchenObject is PlateKitchenObject plateKitchenObject)
+                    {
+                        if (plateKitchenObject.TryAddIngredient(KitchenObject.KitchenObjectItem))
+                        {
+                            KitchenObject.DestroySelf();
+
+                            ChangeState(State.Idle);
+                        }
+                    }
                 }
                 else
                 {
@@ -228,6 +237,11 @@ namespace Counters
                 {
                     StopCoroutine(currentBurningHandler);
                 }
+
+                OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
+                {
+                    progressNormalized = 0,
+                });
             }
 
             currentState = newState;
