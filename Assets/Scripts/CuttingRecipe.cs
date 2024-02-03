@@ -7,5 +7,6 @@ namespace DefaultNamespace
     {
         public KitchenObjectItem input;
         public KitchenObjectItem output;
+        public int maxCuttingProgress;
     }
 }
