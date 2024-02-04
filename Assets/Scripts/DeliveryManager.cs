@@ -12,10 +12,15 @@ namespace DefaultNamespace
     {
         public static DeliveryManager Instance { get; private set; }
 
+        public event EventHandler OnRecipeSpanwed;
+        public event EventHandler OnRecipeCompleted;
+
         [SerializeField] private RecipeList recipeList;
         [SerializeField] private int maxWaitingRecipeAmount = 4;
         [SerializeField] private float maxSpawnRecipeTime = 4;
         private List<RecipeItem> waitingRecipeList = new List<RecipeItem>();
+
+        public IReadOnlyList<RecipeItem> WaitingRecipeList => waitingRecipeList;
 
         private void Awake()
         {
@@ -49,6 +54,8 @@ namespace DefaultNamespace
                     var waitingRecipeItem = recipeList.RecipeItemList[Random.Range(0, recipeList.RecipeItemList.Count)];
                     Debug.Log($"Recipe {waitingRecipeItem.RecipeName} spawned.");
                     waitingRecipeList.Add(waitingRecipeItem);
+
+                    OnRecipeSpanwed?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -83,6 +90,8 @@ namespace DefaultNamespace
             if (matchIndex != -1)
             {
                 waitingRecipeList.RemoveAt(matchIndex);
+
+                OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
             }
             else
             {
