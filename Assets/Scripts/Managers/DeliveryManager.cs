@@ -2,18 +2,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DefaultNamespace;
 using ScriptableObjects;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace DefaultNamespace
+namespace Managers
 {
     public class DeliveryManager : MonoBehaviour
     {
         public static DeliveryManager Instance { get; private set; }
 
-        public event EventHandler OnRecipeSpanwed;
+        public event EventHandler OnRecipeSpawned;
         public event EventHandler OnRecipeCompleted;
+        public event EventHandler OnRecipeSuccess;
+        public event EventHandler OnRecipeFailed;
 
         [SerializeField] private RecipeList recipeList;
         [SerializeField] private int maxWaitingRecipeAmount = 4;
@@ -55,7 +58,7 @@ namespace DefaultNamespace
                     Debug.Log($"Recipe {waitingRecipeItem.RecipeName} spawned.");
                     waitingRecipeList.Add(waitingRecipeItem);
 
-                    OnRecipeSpanwed?.Invoke(this, EventArgs.Empty);
+                    OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -92,10 +95,12 @@ namespace DefaultNamespace
                 waitingRecipeList.RemoveAt(matchIndex);
 
                 OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+                OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
             }
             else
             {
                 Debug.LogWarning($"Player delivered a wrong recipe");
+                OnRecipeFailed?.Invoke(this, EventArgs.Empty);
             }
         }
     }

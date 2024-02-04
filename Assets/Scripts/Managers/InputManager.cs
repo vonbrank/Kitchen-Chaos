@@ -1,8 +1,9 @@
 using System;
+using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace DefaultNamespace
+namespace Managers
 {
     public class InputManager : MonoBehaviour
     {

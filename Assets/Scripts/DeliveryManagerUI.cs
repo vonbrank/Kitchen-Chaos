@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using ScriptableObjects;
 using UnityEngine;
 
@@ -16,13 +17,13 @@ namespace DefaultNamespace
 
         private void OnEnable()
         {
-            DeliveryManager.Instance.OnRecipeSpanwed += HandleRecipeSpawned;
+            DeliveryManager.Instance.OnRecipeSpawned += HandleRecipeSpawned;
             DeliveryManager.Instance.OnRecipeCompleted += HandleRecipeCompleted;
         }
 
         private void OnDisable()
         {
-            DeliveryManager.Instance.OnRecipeSpanwed -= HandleRecipeSpawned;
+            DeliveryManager.Instance.OnRecipeSpawned -= HandleRecipeSpawned;
             DeliveryManager.Instance.OnRecipeCompleted -= HandleRecipeCompleted;
         }
 

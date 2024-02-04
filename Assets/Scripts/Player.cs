@@ -1,5 +1,6 @@
 using System;
 using Counters;
+using Managers;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -7,6 +8,8 @@ namespace DefaultNamespace
     public class Player : MonoBehaviour, IKitchenObjectParent
     {
         public static Player Instance { get; private set; }
+
+        public event EventHandler OnPlayerPickupSomething;
 
         [SerializeField] private float moveSpeed = 10f;
         [SerializeField] private float rotateSpeed = 10f;
@@ -183,6 +186,11 @@ namespace DefaultNamespace
         public void SetKitchenObject(KitchenObject kitchenObject)
         {
             this.kitchenObject = kitchenObject;
+
+            if (this.kitchenObject)
+            {
+                OnPlayerPickupSomething?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public void ClearKitchenObject()
