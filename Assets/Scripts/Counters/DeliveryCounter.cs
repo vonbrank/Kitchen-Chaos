@@ -11,6 +11,7 @@ namespace Counters
             {
                 if (player.KitchenObject is PlateKitchenObject plateKitchenObject)
                 {
+                    DeliveryManager.Instance.DeliverRecipe(plateKitchenObject);
                     player.KitchenObject.DestroySelf();
                 }
             }
