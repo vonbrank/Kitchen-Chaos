@@ -9,6 +9,8 @@ namespace Managers
         public static KitchenGameManager Instance { get; private set; }
 
         public event EventHandler<StateChangedEventArgs> OnStateChanged;
+        public event EventHandler OnGamePaused;
+        public event EventHandler OnGameResume;
 
         public class StateChangedEventArgs : EventArgs
         {
@@ -29,6 +31,7 @@ namespace Managers
         private float resetCountDownTime;
         private float playingTimerElapsed;
         private float maxGamePlayTime = 20f;
+        private bool isGamePaused;
 
         private void Awake()
         {
@@ -39,6 +42,16 @@ namespace Managers
             }
 
             Instance = this;
+        }
+
+        private void OnEnable()
+        {
+            InputManager.Instance.OnPauseAction += HandlePause;
+        }
+
+        private void OnDisable()
+        {
+            InputManager.Instance.OnPauseAction -= HandlePause;
         }
 
         private void Start()
@@ -105,6 +118,27 @@ namespace Managers
             }
 
             ChangeState(State.GameOver);
+        }
+
+        private void HandlePause(object sender, EventArgs e)
+        {
+            TogglePauseGame();
+        }
+
+        public void TogglePauseGame()
+        {
+            isGamePaused = !isGamePaused;
+
+            if (isGamePaused)
+            {
+                OnGamePaused?.Invoke(this, EventArgs.Empty);
+                Time.timeScale = 0;
+            }
+            else
+            {
+                OnGameResume?.Invoke(this, EventArgs.Empty);
+                Time.timeScale = 1;
+            }
         }
 
         public bool IsGamePlaying => state == State.GamePlaying;

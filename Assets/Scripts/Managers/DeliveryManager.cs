@@ -27,9 +27,11 @@ namespace Managers
 
         public int SuccessfulRecipesAmount { get; private set; }
 
+        private Coroutine spawnRecipeCoroutine;
+
         private void Awake()
         {
-            if (Instance is not null)
+            if (Instance)
             {
                 Destroy(gameObject);
                 return;
@@ -38,9 +40,17 @@ namespace Managers
             Instance = this;
         }
 
+        private void OnDestroy()
+        {
+            if (spawnRecipeCoroutine is not null)
+            {
+                StopCoroutine(spawnRecipeCoroutine);
+            }
+        }
+
         private void Start()
         {
-            StartCoroutine(HandleSpawnRecipe());
+            spawnRecipeCoroutine = StartCoroutine(HandleSpawnRecipe());
         }
 
         private IEnumerator HandleSpawnRecipe()

@@ -29,7 +29,7 @@ namespace DefaultNamespace
 
         private void Awake()
         {
-            if (Instance is not null)
+            if (Instance)
             {
                 Debug.LogError("There is more than one instance of Player.");
             }

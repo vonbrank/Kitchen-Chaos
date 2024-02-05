@@ -7,13 +7,25 @@ namespace Managers
 {
     public class InputManager : MonoBehaviour
     {
+        public static InputManager Instance { get; private set; }
+        
         public event EventHandler OnInteractAction;
         public event EventHandler OnInteractAlternateAction;
+        public event EventHandler OnPauseAction;
 
         private PlayerInputActions playerInputActions;
 
         private void Awake()
         {
+            if (Instance)
+            {
+                Debug.LogError("There is more than one instance of InputManager.");
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            
             playerInputActions = new PlayerInputActions();
         }
 
@@ -21,12 +33,14 @@ namespace Managers
         {
             playerInputActions.Player.Interact.performed += InteractPerformed;
             playerInputActions.Player.InteractAlternate.performed += InteractAlternatePerformed;
+            playerInputActions.Player.Pause.performed += PausePerformed;
         }
 
         private void OnDisable()
         {
             playerInputActions.Player.Interact.performed -= InteractPerformed;
             playerInputActions.Player.InteractAlternate.performed -= InteractAlternatePerformed;
+            playerInputActions.Player.Pause.performed -= PausePerformed;
         }
 
         private void InteractPerformed(InputAction.CallbackContext context)
@@ -39,9 +53,21 @@ namespace Managers
             OnInteractAlternateAction?.Invoke(this, EventArgs.Empty);
         }
 
+        private void PausePerformed(InputAction.CallbackContext context)
+        {
+            OnPauseAction?.Invoke(this, EventArgs.Empty);
+        }
+
         private void Start()
         {
             playerInputActions.Player.Enable();
+        }
+
+        private void OnDestroy()
+        {
+            playerInputActions.Dispose();
+
+            Instance = null;
         }
 
         public Vector2 GetMovementVectorNormalized()
