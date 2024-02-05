@@ -14,6 +14,11 @@ namespace Managers
 
         [SerializeField] private AudioClipConfig audioClipConfig;
 
+        private float volumeMultiplier = 0.5f;
+        public float VolumeMultiplier => volumeMultiplier;
+        
+        private const string PLAYER_REFS_SOUND_EFFECTS_VOLUME_MULTIPLIER = "SoundEffectsVolumeMultiplier";
+
         private void Awake()
         {
             if (Instance)
@@ -23,6 +28,7 @@ namespace Managers
             }
 
             Instance = this;
+            volumeMultiplier = PlayerPrefs.GetFloat(PLAYER_REFS_SOUND_EFFECTS_VOLUME_MULTIPLIER, 0.5f);
         }
 
         private void OnEnable()
@@ -91,12 +97,25 @@ namespace Managers
 
         private void PlaySound(AudioClip audioClip, Vector3 position, float volume = 1f)
         {
-            AudioSource.PlayClipAtPoint(audioClip, position, volume);
+            AudioSource.PlayClipAtPoint(audioClip, position, volume * volumeMultiplier);
         }
 
         private void PlaySound(IReadOnlyList<AudioClip> audioClips, Vector3 position, float volume = 1f)
         {
-            AudioSource.PlayClipAtPoint(audioClips[Random.Range(0, audioClips.Count)], position, volume);
+            AudioSource.PlayClipAtPoint(audioClips[Random.Range(0, audioClips.Count)], position,
+                volume * volumeMultiplier);
+        }
+
+        public void ChangeVolume()
+        {
+            volumeMultiplier += 0.1f;
+            if (volumeMultiplier > 1f)
+            {
+                volumeMultiplier = 0;
+            }
+            
+            PlayerPrefs.SetFloat(PLAYER_REFS_SOUND_EFFECTS_VOLUME_MULTIPLIER, volumeMultiplier);
+            PlayerPrefs.Save();
         }
     }
 }

@@ -10,7 +10,9 @@ namespace UI
     {
         [SerializeField] private Button resumeButton;
         [SerializeField] private Button mainMenuButton;
+        [SerializeField] private Button optionsButton;
         [SerializeField] private Transform[] visualGameObjects;
+        [SerializeField] private OptionsUI optionsUI;
 
         private void OnEnable()
         {
@@ -19,6 +21,7 @@ namespace UI
 
             resumeButton.onClick.AddListener(HandleResumeButtonClick);
             mainMenuButton.onClick.AddListener(HandleMainMenuButtonClick);
+            optionsButton.onClick.AddListener(HandleOptionsButtonClick);
         }
 
         private void OnDisable()
@@ -28,6 +31,7 @@ namespace UI
 
             resumeButton.onClick.RemoveListener(HandleResumeButtonClick);
             mainMenuButton.onClick.RemoveListener(HandleMainMenuButtonClick);
+            optionsButton.onClick.RemoveListener(HandleOptionsButtonClick);
         }
 
         private void Start()
@@ -43,6 +47,11 @@ namespace UI
         private void HandleGameResume(object sender, EventArgs e)
         {
             Hide();
+        }
+
+        private void HandleOptionsButtonClick()
+        {
+            optionsUI.Show();
         }
 
         private void HandleMainMenuButtonClick()
@@ -70,6 +79,7 @@ namespace UI
             {
                 visualTransform.gameObject.SetActive(false);
             }
+            optionsUI.Hide();
         }
     }
 }
