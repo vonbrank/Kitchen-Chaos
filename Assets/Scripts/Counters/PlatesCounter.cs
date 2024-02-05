@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using DefaultNamespace;
+using Managers;
 using ScriptableObjects;
 using UnityEngine;
 
@@ -21,9 +22,22 @@ namespace Counters
         private int currentSpawnedPlatesAmount;
         private int maxSpawnedPlatesAmount = 4;
 
-        private void Start()
+        private void OnEnable()
         {
-            currentSpawnPlatesHandler = StartCoroutine(HandleSpawnPlates());
+            KitchenGameManager.Instance.OnStateChanged += HandleStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            KitchenGameManager.Instance.OnStateChanged -= HandleStateChanged;
+        }
+
+        private void OnDestroy()
+        {
+            if (currentSpawnPlatesHandler is not null)
+            {
+                StopCoroutine(currentSpawnPlatesHandler);
+            }
         }
 
         private IEnumerator HandleSpawnPlates()
@@ -62,6 +76,14 @@ namespace Counters
                         currentSpawnedPlatesAmount = currentSpawnedPlatesAmount
                     });
                 }
+            }
+        }
+
+        private void HandleStateChanged(object sender, KitchenGameManager.StateChangedEventArgs e)
+        {
+            if (e.state == KitchenGameManager.State.GamePlaying)
+            {
+                currentSpawnPlatesHandler = StartCoroutine(HandleSpawnPlates());
             }
         }
     }

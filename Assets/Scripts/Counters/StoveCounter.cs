@@ -202,6 +202,10 @@ namespace Counters
             KitchenObject.DestroySelf();
             KitchenObject.SpawnKitchenObject(burningRecipe.output, this);
             ChangeState(State.Burned);
+            OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
+            {
+                progressNormalized = 1
+            });
         }
 
         private void ChangeState(State newState)
@@ -251,5 +255,7 @@ namespace Counters
             });
             // Debug.Log($"current state = {currentState.ToString()}");
         }
+
+        public bool IsFried => currentState == State.Fried;
     }
 }

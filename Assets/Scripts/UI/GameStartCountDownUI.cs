@@ -7,8 +7,18 @@ namespace UI
 {
     public class GameStartCountDownUI : MonoBehaviour
     {
+        private const string NUMBER_POPUP = "NumberPopUp";
+
         [SerializeField] private TextMeshProUGUI countDownText;
         [SerializeField] private Transform[] visualGameObjects;
+
+        private Animator animator;
+        private int previousCountDownNumber;
+
+        private void Awake()
+        {
+            animator = GetComponent<Animator>();
+        }
 
         private void OnEnable()
         {
@@ -29,7 +39,15 @@ namespace UI
         {
             if (KitchenGameManager.Instance.IsCountingDownToStartActive)
             {
-                countDownText.text = $"{Mathf.Ceil(KitchenGameManager.Instance.ResetCountDownTime)}";
+                int currentCountDownNumber = Mathf.CeilToInt(KitchenGameManager.Instance.ResetCountDownTime);
+                if (currentCountDownNumber != previousCountDownNumber)
+                {
+                    animator.SetTrigger(NUMBER_POPUP);
+                    SoundManager.Instance.PlayCountDownSound();
+                }
+
+                countDownText.text = $"{currentCountDownNumber}";
+                previousCountDownNumber = currentCountDownNumber;
             }
         }
 

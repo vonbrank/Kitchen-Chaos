@@ -16,7 +16,7 @@ namespace Managers
 
         private float volumeMultiplier = 0.5f;
         public float VolumeMultiplier => volumeMultiplier;
-        
+
         private const string PLAYER_REFS_SOUND_EFFECTS_VOLUME_MULTIPLIER = "SoundEffectsVolumeMultiplier";
 
         private void Awake()
@@ -95,6 +95,16 @@ namespace Managers
             PlaySound(audioClipConfig.FootsStep, position, volume);
         }
 
+        public void PlayCountDownSound()
+        {
+            PlaySound(audioClipConfig.Warning, Vector3.zero);
+        }
+
+        public void PlayWarningSound(Vector3 position)
+        {
+            PlaySound(audioClipConfig.Warning, position);
+        }
+
         private void PlaySound(AudioClip audioClip, Vector3 position, float volume = 1f)
         {
             AudioSource.PlayClipAtPoint(audioClip, position, volume * volumeMultiplier);
@@ -113,7 +123,7 @@ namespace Managers
             {
                 volumeMultiplier = 0;
             }
-            
+
             PlayerPrefs.SetFloat(PLAYER_REFS_SOUND_EFFECTS_VOLUME_MULTIPLIER, volumeMultiplier);
             PlayerPrefs.Save();
         }

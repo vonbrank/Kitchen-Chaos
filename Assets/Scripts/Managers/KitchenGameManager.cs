@@ -30,7 +30,7 @@ namespace Managers
         private float maxCountDownToStartTime = 3f;
         private float resetCountDownTime;
         private float playingTimerElapsed;
-        private float maxGamePlayTime = 20f;
+        [SerializeField] private float maxGamePlayTime = 180f;
         private bool isGamePaused;
 
         private void Awake()
