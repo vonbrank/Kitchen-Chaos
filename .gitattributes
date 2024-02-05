@@ -2,3 +2,6 @@
 * text=auto eol=lf
 *.{cmd,[cC][mM][dD]} text eol=crlf
 *.{bat,[bB][aA][tT]} text eol=crlf
+
+Assets/Plugins/** linguist-vendored
+Assets/Scripts/Player/PlayerInputActions.cs linguist-vendored
