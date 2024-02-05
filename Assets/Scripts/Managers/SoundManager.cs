@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using Counters;
 using ScriptableObjects;
 using UnityEngine;
+using Utils;
 using Random = UnityEngine.Random;
 
 namespace Managers
 {
-    public class SoundManager : MonoBehaviour
+    public class SoundManager : StaticInstance<SoundManager>
     {
-        public static SoundManager Instance { get; private set; }
-
         [SerializeField] private AudioClipConfig audioClipConfig;
 
         private float volumeMultiplier = 0.5f;
@@ -18,15 +17,10 @@ namespace Managers
 
         private const string PLAYER_REFS_SOUND_EFFECTS_VOLUME_MULTIPLIER = "SoundEffectsVolumeMultiplier";
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance)
-            {
-                Destroy(gameObject);
-                return;
-            }
+            base.Awake();
 
-            Instance = this;
             volumeMultiplier = PlayerPrefs.GetFloat(PLAYER_REFS_SOUND_EFFECTS_VOLUME_MULTIPLIER, 0.5f);
         }
 

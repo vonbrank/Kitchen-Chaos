@@ -1,13 +1,12 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Utils;
 
 namespace Managers
 {
-    public class KitchenGameManager : MonoBehaviour
+    public class KitchenGameManager : StaticInstance<KitchenGameManager>
     {
-        public static KitchenGameManager Instance { get; private set; }
-
         public event EventHandler<StateChangedEventArgs> OnStateChanged;
         public event EventHandler OnGamePaused;
         public event EventHandler OnGameResume;
@@ -32,17 +31,6 @@ namespace Managers
         private float playingTimerElapsed;
         [SerializeField] private float maxGamePlayTime = 180f;
         private bool isGamePaused;
-
-        private void Awake()
-        {
-            if (Instance)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-        }
 
         private void OnEnable()
         {

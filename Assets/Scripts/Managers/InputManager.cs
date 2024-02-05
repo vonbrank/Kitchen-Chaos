@@ -2,14 +2,13 @@ using System;
 using Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Utils;
 
 namespace Managers
 {
-    public class InputManager : MonoBehaviour
+    public class InputManager : StaticInstance<InputManager>
     {
         private const string PLAYER_PREFS_BIDINGS = "InputBindings";
-
-        public static InputManager Instance { get; private set; }
 
         public event EventHandler OnInteractAction;
         public event EventHandler OnInteractAlternateAction;
@@ -33,16 +32,9 @@ namespace Managers
 
         private PlayerInputActions playerInputActions;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance)
-            {
-                Debug.LogError("There is more than one instance of InputManager.");
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
+            base.Awake();
 
             playerInputActions = new PlayerInputActions();
 

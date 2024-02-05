@@ -1,10 +1,10 @@
 using UnityEngine;
+using Utils;
 
 namespace Managers
 {
-    public class MusicManager : MonoBehaviour
+    public class MusicManager : StaticInstance<MusicManager>
     {
-        public static MusicManager Instance { get; private set; }
         private float volumeMultiplier = 0.5f;
         public float VolumeMultiplier => volumeMultiplier;
 
@@ -13,15 +13,9 @@ namespace Managers
 
         private const string PLAYER_REFS_MUSIC_VOLUME_MULTIPLIER = "MusicVolumeMultiplier";
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
+            base.Awake();
 
             audioSource = GetComponent<AudioSource>();
             volume = audioSource.volume;

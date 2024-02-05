@@ -5,14 +5,13 @@ using System.Linq;
 using KitchenObjects;
 using ScriptableObjects;
 using UnityEngine;
+using Utils;
 using Random = UnityEngine.Random;
 
 namespace Managers
 {
-    public class DeliveryManager : MonoBehaviour
+    public class DeliveryManager : StaticInstance<DeliveryManager>
     {
-        public static DeliveryManager Instance { get; private set; }
-
         public event EventHandler OnRecipeSpawned;
         public event EventHandler OnRecipeCompleted;
         public event EventHandler OnRecipeSuccess;
@@ -28,17 +27,6 @@ namespace Managers
         public int SuccessfulRecipesAmount { get; private set; }
 
         private Coroutine spawnRecipeCoroutine;
-
-        private void Awake()
-        {
-            if (Instance)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-        }
 
         private void OnEnable()
         {
