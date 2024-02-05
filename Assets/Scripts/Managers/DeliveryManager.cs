@@ -25,6 +25,8 @@ namespace Managers
 
         public IReadOnlyList<RecipeItem> WaitingRecipeList => waitingRecipeList;
 
+        public int SuccessfulRecipesAmount { get; private set; }
+
         private void Awake()
         {
             if (Instance is not null)
@@ -93,6 +95,8 @@ namespace Managers
             if (matchIndex != -1)
             {
                 waitingRecipeList.RemoveAt(matchIndex);
+
+                SuccessfulRecipesAmount++;
 
                 OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
                 OnRecipeSuccess?.Invoke(this, EventArgs.Empty);

@@ -27,7 +27,8 @@ namespace Managers
         private float maxWaitingToStartTime = 1f;
         private float maxCountDownToStartTime = 3f;
         private float resetCountDownTime;
-        private float maxGamePlayTime = 120f;
+        private float playingTimerElapsed;
+        private float maxGamePlayTime = 20f;
 
         private void Awake()
         {
@@ -96,11 +97,11 @@ namespace Managers
 
         private IEnumerator HandleGamePlaying()
         {
-            float timeElapsed = 0f;
-            while (timeElapsed < maxGamePlayTime)
+            playingTimerElapsed = 0f;
+            while (playingTimerElapsed < maxGamePlayTime)
             {
                 yield return null;
-                timeElapsed += Time.deltaTime;
+                playingTimerElapsed += Time.deltaTime;
             }
 
             ChangeState(State.GameOver);
@@ -109,5 +110,6 @@ namespace Managers
         public bool IsGamePlaying => state == State.GamePlaying;
         public bool IsCountingDownToStartActive => state == State.CountDownToStart;
         public float ResetCountDownTime => resetCountDownTime;
+        public float GamePlayingTimeNormalized => playingTimerElapsed / maxGamePlayTime;
     }
 }
