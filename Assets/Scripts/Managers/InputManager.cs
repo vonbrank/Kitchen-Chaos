@@ -15,6 +15,8 @@ namespace Managers
         public event EventHandler OnInteractAlternateAction;
         public event EventHandler OnPauseAction;
 
+        public event EventHandler OnKeyRebind;
+
         public enum Binding
         {
             MoveUp,
@@ -87,8 +89,6 @@ namespace Managers
         private void OnDestroy()
         {
             playerInputActions.Dispose();
-
-            Instance = null;
         }
 
         public Vector2 GetMovementVectorNormalized()
@@ -119,11 +119,11 @@ namespace Managers
                 case Binding.InteractAlt:
                     return playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
                 case Binding.Pause:
-                    return playerInputActions.Player.Pause.bindings[0].ToDisplayString();              
+                    return playerInputActions.Player.Pause.bindings[0].ToDisplayString();
                 case Binding.GamepadInteract:
-                    return playerInputActions.Player.Interact.bindings[1].ToDisplayString();              
+                    return playerInputActions.Player.Interact.bindings[1].ToDisplayString();
                 case Binding.GamepadInteractAlt:
-                    return playerInputActions.Player.InteractAlternate.bindings[1].ToDisplayString();              
+                    return playerInputActions.Player.InteractAlternate.bindings[1].ToDisplayString();
                 case Binding.GamepadPause:
                     return playerInputActions.Player.Pause.bindings[1].ToDisplayString();
             }
@@ -160,6 +160,7 @@ namespace Managers
                     callback.Dispose();
 
                     onRebindComplete?.Invoke();
+                    OnKeyRebind?.Invoke(this, EventArgs.Empty);
 
                     PlayerPrefs.SetString(PLAYER_PREFS_BIDINGS, playerInputActions.SaveBindingOverridesAsJson());
                     PlayerPrefs.Save();

@@ -40,6 +40,16 @@ namespace Managers
             Instance = this;
         }
 
+        private void OnEnable()
+        {
+            KitchenGameManager.Instance.OnStateChanged += HandleStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            KitchenGameManager.Instance.OnStateChanged -= HandleStateChanged;
+        }
+
         private void OnDestroy()
         {
             if (spawnRecipeCoroutine is not null)
@@ -50,7 +60,6 @@ namespace Managers
 
         private void Start()
         {
-            spawnRecipeCoroutine = StartCoroutine(HandleSpawnRecipe());
         }
 
         private IEnumerator HandleSpawnRecipe()
@@ -115,6 +124,14 @@ namespace Managers
             {
                 Debug.LogWarning($"Player delivered a wrong recipe");
                 OnRecipeFailed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void HandleStateChanged(object sender, KitchenGameManager.StateChangedEventArgs e)
+        {
+            if (e.state == KitchenGameManager.State.GamePlaying)
+            {
+                spawnRecipeCoroutine = StartCoroutine(HandleSpawnRecipe());
             }
         }
     }

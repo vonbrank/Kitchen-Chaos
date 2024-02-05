@@ -47,11 +47,13 @@ namespace Managers
         private void OnEnable()
         {
             InputManager.Instance.OnPauseAction += HandlePause;
+            InputManager.Instance.OnInteractAction += HandleInteractAction;
         }
 
         private void OnDisable()
         {
             InputManager.Instance.OnPauseAction -= HandlePause;
+            InputManager.Instance.OnInteractAction -= HandleInteractAction;
         }
 
         private void Start()
@@ -64,7 +66,7 @@ namespace Managers
             switch (newState)
             {
                 case State.WaitingToStart:
-                    StartCoroutine(HandleWaitingToStart());
+                    // StartCoroutine(HandleWaitingToStart());
                     break;
                 case State.CountDownToStart:
                     StartCoroutine(HandleCountDownToStart());
@@ -145,5 +147,13 @@ namespace Managers
         public bool IsCountingDownToStartActive => state == State.CountDownToStart;
         public float ResetCountDownTime => resetCountDownTime;
         public float GamePlayingTimeNormalized => playingTimerElapsed / maxGamePlayTime;
+
+        private void HandleInteractAction(object sender, EventArgs e)
+        {
+            if (state == State.WaitingToStart)
+            {
+                ChangeState(State.CountDownToStart);
+            }
+        }
     }
 }
