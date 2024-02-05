@@ -1,6 +1,5 @@
 using System;
 using Counters;
-using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.UI;
 

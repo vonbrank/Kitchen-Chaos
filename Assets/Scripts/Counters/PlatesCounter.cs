@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using DefaultNamespace;
+using KitchenObjects;
 using Managers;
 using ScriptableObjects;
 using UnityEngine;
@@ -63,7 +63,7 @@ namespace Counters
             }
         }
 
-        public override void Interact(Player player)
+        public override void Interact(Player.Player player)
         {
             if (!player.HasKitchenObject())
             {

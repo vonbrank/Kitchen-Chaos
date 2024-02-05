@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Utils
 {
     public class LoadSceneCallback : MonoBehaviour
     {

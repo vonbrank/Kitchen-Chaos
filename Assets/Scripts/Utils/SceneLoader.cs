@@ -1,6 +1,6 @@
 using UnityEngine.SceneManagement;
 
-namespace DefaultNamespace
+namespace Utils
 {
     public static class SceneLoader
     {

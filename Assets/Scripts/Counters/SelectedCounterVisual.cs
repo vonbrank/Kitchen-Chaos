@@ -1,5 +1,4 @@
 using System;
-using DefaultNamespace;
 using UnityEngine;
 
 namespace Counters
@@ -11,15 +10,15 @@ namespace Counters
 
         private void OnEnable()
         {
-            Player.Instance.OnSelectedCounterChanged += HandleSelectedCounterChange;
+            Player.Player.Instance.OnSelectedCounterChanged += HandleSelectedCounterChange;
         }
 
         private void OnDisable()
         {
-            Player.Instance.OnSelectedCounterChanged -= HandleSelectedCounterChange;
+            Player.Player.Instance.OnSelectedCounterChanged -= HandleSelectedCounterChange;
         }
 
-        private void HandleSelectedCounterChange(object sender, Player.SelectedCounterChangedEventArgs e)
+        private void HandleSelectedCounterChange(object sender, Player.Player.SelectedCounterChangedEventArgs e)
         {
             if (e.BaseCounter == baseCounter)
             {

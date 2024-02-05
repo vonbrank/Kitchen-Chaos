@@ -1,8 +1,8 @@
 using System;
-using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Utils;
 
 namespace UI
 {

@@ -1,9 +1,10 @@
 using System;
 using Counters;
+using KitchenObjects;
 using Managers;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Player
 {
     public class Player : MonoBehaviour, IKitchenObjectParent
     {

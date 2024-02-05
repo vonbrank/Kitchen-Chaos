@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ScriptableObjects;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace KitchenObjects
 {
     public class PlateKitchenObject : KitchenObject
     {

@@ -1,5 +1,5 @@
 using System;
-using DefaultNamespace;
+using KitchenObjects;
 using Managers;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ namespace Counters
             Instance = this;
         }
 
-        public override void Interact(Player player)
+        public override void Interact(Player.Player player)
         {
             if (player.HasKitchenObject())
             {

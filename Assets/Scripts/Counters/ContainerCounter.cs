@@ -1,5 +1,5 @@
 using System;
-using DefaultNamespace;
+using KitchenObjects;
 using ScriptableObjects;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ namespace Counters
 
         public event EventHandler OnPlayerGrabObject;
 
-        public override void Interact(Player player)
+        public override void Interact(Player.Player player)
         {
             if (!player.HasKitchenObject())
             {

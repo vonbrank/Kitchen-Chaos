@@ -1,7 +1,7 @@
 using ScriptableObjects;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace KitchenObjects
 {
     public class KitchenObject : MonoBehaviour
     {

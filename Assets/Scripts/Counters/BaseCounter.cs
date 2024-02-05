@@ -1,5 +1,5 @@
 using System;
-using DefaultNamespace;
+using KitchenObjects;
 using UnityEngine;
 
 namespace Counters
@@ -13,12 +13,12 @@ namespace Counters
         private KitchenObject kitchenObject;
         public KitchenObject KitchenObject => kitchenObject;
 
-        public virtual void Interact(Player player)
+        public virtual void Interact(Player.Player player)
         {
             Debug.LogError("BaseCounter.Interact();");
         }
 
-        public virtual void InteractAlternate(Player player)
+        public virtual void InteractAlternate(Player.Player player)
         {
             // Debug.LogError("BaseCounter.InteractAlternate();");
         }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace KitchenObjects
 {
     public interface IKitchenObjectParent
     {

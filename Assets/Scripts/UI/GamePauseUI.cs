@@ -1,8 +1,8 @@
 using System;
-using DefaultNamespace;
 using Managers;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 namespace UI
 {

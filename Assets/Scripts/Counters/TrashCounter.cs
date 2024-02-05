@@ -1,5 +1,4 @@
 using System;
-using DefaultNamespace;
 using UnityEngine;
 
 namespace Counters
@@ -8,7 +7,7 @@ namespace Counters
     {
         public static event EventHandler OnAnyObjectTrashed;
 
-        public override void Interact(Player player)
+        public override void Interact(Player.Player player)
         {
             if (player.HasKitchenObject())
             {

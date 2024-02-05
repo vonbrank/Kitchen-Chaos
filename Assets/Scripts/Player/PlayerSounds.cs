@@ -3,7 +3,7 @@ using System.Collections;
 using Managers;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Player
 {
     public class PlayerSounds : MonoBehaviour
     {

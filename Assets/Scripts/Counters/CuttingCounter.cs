@@ -1,5 +1,5 @@
 using System;
-using DefaultNamespace;
+using KitchenObjects;
 using ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -17,7 +17,7 @@ namespace Counters
 
         private int cuttingProgress;
 
-        public override void Interact(Player player)
+        public override void Interact(Player.Player player)
         {
             if (HasKitchenObject())
             {
@@ -53,7 +53,7 @@ namespace Counters
             }
         }
 
-        public override void InteractAlternate(Player player)
+        public override void InteractAlternate(Player.Player player)
         {
             if (HasKitchenObject() && HasRecipeWithInput(KitchenObject.KitchenObjectItem))
             {
