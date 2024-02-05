@@ -18,6 +18,9 @@ namespace UI
         [SerializeField] private Button interactButton;
         [SerializeField] private Button interactAltButton;
         [SerializeField] private Button pauseButton;
+        [SerializeField] private Button gamepadInteractButton;
+        [SerializeField] private Button gamepadInteractAltButton;
+        [SerializeField] private Button gamepadPauseButton;
 
         [SerializeField] private TextMeshProUGUI soundEffectsText;
         [SerializeField] private TextMeshProUGUI musicText;
@@ -28,8 +31,13 @@ namespace UI
         [SerializeField] private TextMeshProUGUI interactText;
         [SerializeField] private TextMeshProUGUI interactAltText;
         [SerializeField] private TextMeshProUGUI pauseText;
+        [SerializeField] private TextMeshProUGUI gamepadInteractText;
+        [SerializeField] private TextMeshProUGUI gamepadInteractAltText;
+        [SerializeField] private TextMeshProUGUI gamepadPauseText;
 
         [SerializeField] private Transform pressToRebindKeyGameObject;
+
+        public event Action OnClose;
 
         private void OnEnable()
         {
@@ -44,6 +52,10 @@ namespace UI
             interactButton.onClick.AddListener(HandleInteractButtonClick);
             interactAltButton.onClick.AddListener(HandleInteractAltButtonClick);
             pauseButton.onClick.AddListener(HandlePauseButtonClick);
+
+            gamepadInteractButton.onClick.AddListener(HandleGamepadInteractButtonClick);
+            gamepadInteractAltButton.onClick.AddListener(HandleGamepadInteractAltButtonClick);
+            gamepadPauseButton.onClick.AddListener(HandleGamepadPauseButtonClick);
         }
 
         private void OnDisable()
@@ -59,6 +71,10 @@ namespace UI
             interactButton.onClick.RemoveListener(HandleInteractButtonClick);
             interactAltButton.onClick.RemoveListener(HandleInteractAltButtonClick);
             pauseButton.onClick.RemoveListener(HandlePauseButtonClick);
+
+            gamepadInteractButton.onClick.RemoveListener(HandleGamepadInteractButtonClick);
+            gamepadInteractAltButton.onClick.RemoveListener(HandleGamepadInteractAltButtonClick);
+            gamepadPauseButton.onClick.RemoveListener(HandleGamepadPauseButtonClick);
         }
 
         private void Start()
@@ -97,6 +113,9 @@ namespace UI
             interactText.text = InputManager.Instance.GetBindingText(InputManager.Binding.Interact);
             interactAltText.text = InputManager.Instance.GetBindingText(InputManager.Binding.InteractAlt);
             pauseText.text = InputManager.Instance.GetBindingText(InputManager.Binding.Pause);
+            gamepadInteractText.text = InputManager.Instance.GetBindingText(InputManager.Binding.GamepadInteract);
+            gamepadInteractAltText.text = InputManager.Instance.GetBindingText(InputManager.Binding.GamepadInteractAlt);
+            gamepadPauseText.text = InputManager.Instance.GetBindingText(InputManager.Binding.GamepadPause);
         }
 
         [SerializeField] private Transform[] visualGameObjects;
@@ -108,6 +127,8 @@ namespace UI
             {
                 visualTransform.gameObject.SetActive(true);
             }
+            
+            soundEffectsButton.Select();
         }
 
         public void Hide()
@@ -118,6 +139,7 @@ namespace UI
             }
 
             HidePressToRebindKey();
+            OnClose?.Invoke();
         }
 
         private void ShowPressToRebindKey()
@@ -143,6 +165,9 @@ namespace UI
         private void HandleInteractButtonClick() => RebindBinding(InputManager.Binding.Interact);
         private void HandleInteractAltButtonClick() => RebindBinding(InputManager.Binding.InteractAlt);
         private void HandlePauseButtonClick() => RebindBinding(InputManager.Binding.Pause);
+        private void HandleGamepadInteractButtonClick() => RebindBinding(InputManager.Binding.GamepadInteract);
+        private void HandleGamepadInteractAltButtonClick() => RebindBinding(InputManager.Binding.GamepadInteractAlt);
+        private void HandleGamepadPauseButtonClick() => RebindBinding(InputManager.Binding.GamepadPause);
 
         private void RebindBinding(InputManager.Binding binding)
         {

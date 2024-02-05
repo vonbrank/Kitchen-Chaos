@@ -51,7 +51,9 @@ namespace UI
 
         private void HandleOptionsButtonClick()
         {
+            Hide();
             optionsUI.Show();
+            optionsUI.OnClose += HandleOptionsUIClose;
         }
 
         private void HandleMainMenuButtonClick()
@@ -71,6 +73,8 @@ namespace UI
             {
                 visualTransform.gameObject.SetActive(true);
             }
+
+            resumeButton.Select();
         }
 
         private void Hide()
@@ -79,7 +83,14 @@ namespace UI
             {
                 visualTransform.gameObject.SetActive(false);
             }
+
             optionsUI.Hide();
+        }
+
+        private void HandleOptionsUIClose()
+        {
+            optionsUI.OnClose -= HandleOptionsUIClose;
+            Show();
         }
     }
 }

@@ -135,7 +135,7 @@ namespace DefaultNamespace
             float playerRadius = 0.7f;
             float playerHeight = 2f;
 
-            bool canMove = !Physics.CapsuleCast(
+            bool canMove = (moveDir.magnitude > 0.5f) && !Physics.CapsuleCast(
                 transform.position,
                 transform.position + Vector3.up * playerHeight,
                 playerRadius,

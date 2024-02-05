@@ -24,6 +24,9 @@ namespace Managers
             Interact,
             InteractAlt,
             Pause,
+            GamepadInteract,
+            GamepadInteractAlt,
+            GamepadPause,
         }
 
         private PlayerInputActions playerInputActions;
@@ -116,7 +119,13 @@ namespace Managers
                 case Binding.InteractAlt:
                     return playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
                 case Binding.Pause:
-                    return playerInputActions.Player.Pause.bindings[0].ToDisplayString();
+                    return playerInputActions.Player.Pause.bindings[0].ToDisplayString();              
+                case Binding.GamepadInteract:
+                    return playerInputActions.Player.Interact.bindings[1].ToDisplayString();              
+                case Binding.GamepadInteractAlt:
+                    return playerInputActions.Player.InteractAlternate.bindings[1].ToDisplayString();              
+                case Binding.GamepadPause:
+                    return playerInputActions.Player.Pause.bindings[1].ToDisplayString();
             }
         }
 
@@ -131,6 +140,9 @@ namespace Managers
                 Binding.Interact => (playerInputActions.Player.Interact, 0),
                 Binding.InteractAlt => (playerInputActions.Player.InteractAlternate, 0),
                 Binding.Pause => (playerInputActions.Player.Pause, 0),
+                Binding.GamepadInteract => (playerInputActions.Player.Interact, 1),
+                Binding.GamepadInteractAlt => (playerInputActions.Player.InteractAlternate, 1),
+                Binding.GamepadPause => (playerInputActions.Player.Pause, 1),
                 _ => (null, 0)
             };
 

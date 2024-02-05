@@ -23,6 +23,11 @@ namespace UI
             quitButton.onClick.RemoveListener(HandleQuit);
         }
 
+        private void Start()
+        {
+            playButton.Select();
+        }
+
         private void HandlePlay()
         {
             SceneLoader.Load(SceneLoader.Scene.GameScene);
