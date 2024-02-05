@@ -1,9 +1,10 @@
 using System;
 using Counters;
+using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DefaultNamespace
+namespace UI
 {
     public class ProgressBarUI : MonoBehaviour
     {

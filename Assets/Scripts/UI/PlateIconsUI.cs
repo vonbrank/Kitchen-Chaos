@@ -1,8 +1,9 @@
+using DefaultNamespace;
 using ScriptableObjects;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DefaultNamespace
+namespace UI
 {
     public class PlateIconsUI : MonoBehaviour
     {

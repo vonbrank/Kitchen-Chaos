@@ -3,7 +3,7 @@ using Managers;
 using ScriptableObjects;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace UI
 {
     public class DeliveryManagerUI : MonoBehaviour
     {

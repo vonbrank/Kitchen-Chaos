@@ -3,7 +3,7 @@ using ScriptableObjects;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DefaultNamespace
+namespace UI
 {
     public class PlateIconImageUI : MonoBehaviour
     {

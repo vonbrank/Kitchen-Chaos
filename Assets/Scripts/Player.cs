@@ -100,6 +100,11 @@ namespace DefaultNamespace
 
         private void HandleInteractAction(object sender, EventArgs e)
         {
+            if (!KitchenGameManager.Instance.IsGamePlaying)
+            {
+                return;
+            }
+
             if (selectedCounter is not null)
             {
                 selectedCounter.Interact(this);
@@ -108,6 +113,11 @@ namespace DefaultNamespace
 
         private void HandleInteractAlternateAction(object sender, EventArgs e)
         {
+            if (!KitchenGameManager.Instance.IsGamePlaying)
+            {
+                return;
+            }
+
             if (selectedCounter is not null)
             {
                 selectedCounter.InteractAlternate(this);
