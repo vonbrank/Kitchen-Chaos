@@ -99,6 +99,7 @@ namespace UI
         private void HandleCloseButtonClick()
         {
             Hide();
+            OnClose?.Invoke();
         }
 
         private void UpdateVisual()
@@ -127,7 +128,7 @@ namespace UI
             {
                 visualTransform.gameObject.SetActive(true);
             }
-            
+
             soundEffectsButton.Select();
         }
 
@@ -139,7 +140,6 @@ namespace UI
             }
 
             HidePressToRebindKey();
-            OnClose?.Invoke();
         }
 
         private void ShowPressToRebindKey()
