@@ -6804,6 +6804,7 @@ GameObject:
   m_Component:
   - component: {fileID: 580936182}
   - component: {fileID: 580936183}
+  - component: {fileID: 580936184}
   m_Layer: 0
   m_Name: Delivery Manager
   m_TagString: Untagged
@@ -6841,6 +6842,22 @@ MonoBehaviour:
   recipeList: {fileID: 11400000, guid: 89a55535c76678a4581573328a44367a, type: 2}
   maxWaitingRecipeAmount: 4
   maxSpawnRecipeTime: 4
+--- !u!114 &580936184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580936181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2240281254
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &600177250
 GameObject:
   m_ObjectHideFlags: 0

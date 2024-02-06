@@ -148,7 +148,7 @@ namespace Managers
 
         private void DebugAutomaticStartGame()
         {
-            maxCountDownToStartTime = 1f;
+            // maxCountDownToStartTime = 1f;
             ChangeState(State.CountDownToStart);
         }
     }
