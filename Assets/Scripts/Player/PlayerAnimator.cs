@@ -1,9 +1,10 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Player
 {
-    public class PlayerAnimator : MonoBehaviour
+    public class PlayerAnimator : NetworkBehaviour
     {
         private const string IS_WALKING = "IsWalking";
 
@@ -18,6 +19,11 @@ namespace Player
 
         private void Update()
         {
+            if (!IsOwner)
+            {
+                return;
+            }
+
             animator.SetBool(IS_WALKING, player.IsWalking);
         }
     }

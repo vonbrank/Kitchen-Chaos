@@ -49,6 +49,11 @@ namespace Player
 
         private void Update()
         {
+            if (!IsOwner)
+            {
+                return;
+            }
+            
             HandleMovement();
             HandleInteractions();
         }
