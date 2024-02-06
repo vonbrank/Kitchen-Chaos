@@ -47,6 +47,8 @@ namespace Managers
         private void Start()
         {
             ChangeState(State.WaitingToStart);
+
+            DebugAutomaticStartGame();
         }
 
         private void ChangeState(State newState)
@@ -142,6 +144,12 @@ namespace Managers
             {
                 ChangeState(State.CountDownToStart);
             }
+        }
+
+        private void DebugAutomaticStartGame()
+        {
+            maxCountDownToStartTime = 1f;
+            ChangeState(State.CountDownToStart);
         }
     }
 }

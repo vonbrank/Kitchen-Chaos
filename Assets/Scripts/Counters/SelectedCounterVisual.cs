@@ -10,12 +10,12 @@ namespace Counters
 
         private void OnEnable()
         {
-            Player.Player.Instance.OnSelectedCounterChanged += HandleSelectedCounterChange;
+            // Player.Player.Instance.OnSelectedCounterChanged += HandleSelectedCounterChange;
         }
 
         private void OnDisable()
         {
-            Player.Player.Instance.OnSelectedCounterChanged -= HandleSelectedCounterChange;
+            // Player.Player.Instance.OnSelectedCounterChanged -= HandleSelectedCounterChange;
         }
 
         private void HandleSelectedCounterChange(object sender, Player.Player.SelectedCounterChangedEventArgs e)

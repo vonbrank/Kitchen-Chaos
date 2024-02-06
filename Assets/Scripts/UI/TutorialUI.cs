@@ -28,15 +28,7 @@ namespace UI
         {
             InputManager.Instance.OnKeyRebind -= HandleKeyRebind;
             KitchenGameManager.Instance.OnStateChanged -= HandleStateChanged;
-
         }
-
-        private void Start()
-        {
-            UpdateVisual();
-            Show();
-        }
-
 
         private void HandleKeyRebind(object sender, EventArgs e)
         {
@@ -79,7 +71,12 @@ namespace UI
 
         private void HandleStateChanged(object sender, KitchenGameManager.StateChangedEventArgs e)
         {
-            if (e.state == KitchenGameManager.State.CountDownToStart)
+            if (e.state == KitchenGameManager.State.WaitingToStart)
+            {
+                UpdateVisual();
+                Show();
+            }
+            else if (e.state == KitchenGameManager.State.CountDownToStart)
             {
                 Hide();
             }

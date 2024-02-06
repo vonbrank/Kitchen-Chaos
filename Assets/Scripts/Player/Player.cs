@@ -2,20 +2,21 @@ using System;
 using Counters;
 using KitchenObjects;
 using Managers;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Player
 {
-    public class Player : MonoBehaviour, IKitchenObjectParent
+    public class Player : NetworkBehaviour, IKitchenObjectParent
     {
-        public static Player Instance { get; private set; }
+        // public static Player Instance { get; private set; }
 
         public event EventHandler OnPlayerPickupSomething;
 
         [SerializeField] private float moveSpeed = 10f;
         [SerializeField] private float rotateSpeed = 10f;
 
-        [SerializeField] private InputManager inputManager;
+        // [SerializeField] private InputManager inputManager;
         [SerializeField] private LayerMask countersLayerMask;
 
         private Vector3 lastInteractDir;
@@ -30,24 +31,19 @@ namespace Player
 
         private void Awake()
         {
-            if (Instance)
-            {
-                Debug.LogError("There is more than one instance of Player.");
-            }
-
-            Instance = this;
+            // Instance = this;
         }
 
         private void OnEnable()
         {
-            inputManager.OnInteractAction += HandleInteractAction;
-            inputManager.OnInteractAlternateAction += HandleInteractAlternateAction;
+            InputManager.Instance.OnInteractAction += HandleInteractAction;
+            InputManager.Instance.OnInteractAlternateAction += HandleInteractAlternateAction;
         }
 
         private void OnDisable()
         {
-            inputManager.OnInteractAction -= HandleInteractAction;
-            inputManager.OnInteractAlternateAction -= HandleInteractAlternateAction;
+            InputManager.Instance.OnInteractAction -= HandleInteractAction;
+            InputManager.Instance.OnInteractAlternateAction -= HandleInteractAlternateAction;
         }
 
 
@@ -61,7 +57,7 @@ namespace Player
 
         private void HandleInteractions()
         {
-            var inputVector = inputManager.GetMovementVectorNormalized();
+            var inputVector = InputManager.Instance.GetMovementVectorNormalized();
 
             var moveDir = new Vector3(inputVector.x, 0, inputVector.y);
 
@@ -127,7 +123,7 @@ namespace Player
 
         private void HandleMovement()
         {
-            var inputVector = inputManager.GetMovementVectorNormalized();
+            var inputVector = InputManager.Instance.GetMovementVectorNormalized();
 
             var moveDir = new Vector3(inputVector.x, 0, inputVector.y);
             transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
