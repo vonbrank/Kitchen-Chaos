@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using KitchenObjects;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Counters
@@ -27,11 +28,31 @@ namespace Counters
         [SerializeField] private FryingRecipe[] fryingRecipes;
         [SerializeField] private BurningRecipe[] burningRecipes;
 
-        private State currentState;
+        private NetworkVariable<State> currentState = new NetworkVariable<State>(State.Idle);
+        private NetworkVariable<float> progressNormalized = new NetworkVariable<float>(0f);
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            currentState.OnValueChanged += HandleCurrentStateNetworkValueChanged;
+            progressNormalized.OnValueChanged += HandleProgressNormalizedNetworkValueChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+
+            currentState.OnValueChanged -= HandleCurrentStateNetworkValueChanged;
+            progressNormalized.OnValueChanged -= HandleProgressNormalizedNetworkValueChanged;
+        }
 
         private void Start()
         {
-            ChangeState(State.Idle);
+            if (IsServer)
+            {
+                ChangeState(State.Idle);
+            }
         }
 
         public override void Interact(Player.Player player)
@@ -44,7 +65,8 @@ namespace Counters
                     {
                         if (plateKitchenObject.TryAddIngredient(KitchenObject.KitchenObjectItem))
                         {
-                            KitchenObject.DestroySelf();
+                            KitchenObject.DestroyKitchenObject(KitchenObject);
+                            // KitchenObject.DestroySelf();
 
                             ChangeState(State.Idle);
                         }
@@ -156,18 +178,20 @@ namespace Counters
 
             FryingRecipe fryingRecipe = GetFryingRecipeFromInput(KitchenObject.KitchenObjectItem);
 
-            float timeElapsed = 0;
-            while (timeElapsed <= fryingRecipe.maxFryingProgress)
+            float fryTimeElapsed = 0;
+            while (fryTimeElapsed <= fryingRecipe.maxFryingProgress)
             {
                 yield return null;
-                timeElapsed += Time.deltaTime;
-                OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
-                {
-                    progressNormalized = Mathf.Clamp(timeElapsed / fryingRecipe.maxFryingProgress, 0, 1)
-                });
+                fryTimeElapsed += Time.deltaTime;
+                progressNormalized.Value = Mathf.Clamp(fryTimeElapsed / fryingRecipe.maxFryingProgress, 0, 1);
+                // OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
+                // {
+                //     progressNormalized = Mathf.Clamp(fryTimeElapsed / fryingRecipe.maxFryingProgress, 0, 1)
+                // });
             }
 
-            KitchenObject.DestroySelf();
+            KitchenObject.DestroyKitchenObject(KitchenObject);
+            // KitchenObject.DestroySelf();
             KitchenObject.SpawnKitchenObject(fryingRecipe.output, this);
             ChangeState(State.Fried);
         }
@@ -188,29 +212,38 @@ namespace Counters
 
             BurningRecipe burningRecipe = GetBurningRecipeFromInput(KitchenObject.KitchenObjectItem);
 
-            float timeElapsed = 0;
-            while (timeElapsed <= burningRecipe.maxBurningProgress)
+            float burnTimeElapsed = 0;
+            while (burnTimeElapsed <= burningRecipe.maxBurningProgress)
             {
                 yield return null;
-                timeElapsed += Time.deltaTime;
-                OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
-                {
-                    progressNormalized = Mathf.Clamp(timeElapsed / burningRecipe.maxBurningProgress, 0, 1)
-                });
+                burnTimeElapsed += Time.deltaTime;
+                progressNormalized.Value = Mathf.Clamp(burnTimeElapsed / burningRecipe.maxBurningProgress, 0, 1);
+                // OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
+                // {
+                //     progressNormalized = Mathf.Clamp(burnTimeElapsed / burningRecipe.maxBurningProgress, 0, 1)
+                // });
             }
 
-            KitchenObject.DestroySelf();
+            KitchenObject.DestroyKitchenObject(KitchenObject);
+            // KitchenObject.DestroySelf();
             KitchenObject.SpawnKitchenObject(burningRecipe.output, this);
             ChangeState(State.Burned);
-            OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
-            {
-                progressNormalized = 1
-            });
+            progressNormalized.Value = 1;
+            // OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
+            // {
+            //     progressNormalized = 1
+            // });
         }
 
         private void ChangeState(State newState)
         {
-            if (currentState == State.Idle && newState == State.Frying)
+            ChangeStateServerRpc(newState);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ChangeStateServerRpc(State newState)
+        {
+            if (currentState.Value == State.Idle && newState == State.Frying)
             {
                 if (currentFryHandler is not null)
                 {
@@ -220,7 +253,7 @@ namespace Counters
                 currentFryHandler = StartCoroutine(HandleFry());
             }
 
-            if ((currentState == State.Idle || currentState == State.Frying) && newState == State.Fried)
+            if ((currentState.Value == State.Idle || currentState.Value == State.Frying) && newState == State.Fried)
             {
                 if (currentBurningHandler is not null)
                 {
@@ -242,20 +275,36 @@ namespace Counters
                     StopCoroutine(currentBurningHandler);
                 }
 
-                OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
-                {
-                    progressNormalized = 0,
-                });
+                progressNormalized.Value = 0;
+                // OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
+                // {
+                //     progressNormalized = 0,
+                // });
             }
 
-            currentState = newState;
-            OnStateChanged?.Invoke(this, new StateChangedEventArgs
-            {
-                state = currentState
-            });
+            currentState.Value = newState;
+
             // Debug.Log($"current state = {currentState.ToString()}");
         }
 
-        public bool IsFried => currentState == State.Fried;
+        private void HandleCurrentStateNetworkValueChanged(State previousValue, State newValue)
+        {
+            // Debug.Log($"stove counter current state = {newValue.ToString()}");
+            OnStateChanged?.Invoke(this, new StateChangedEventArgs
+            {
+                state = newValue
+            });
+        }
+
+        private void HandleProgressNormalizedNetworkValueChanged(float previousValue, float newValue)
+        {
+            OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs
+            {
+                progressNormalized = newValue,
+            });
+        }
+
+
+        public bool IsFried => currentState.Value == State.Fried;
     }
 }

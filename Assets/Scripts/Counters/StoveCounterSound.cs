@@ -54,6 +54,11 @@ namespace Counters
             {
                 audioSource.Pause();
             }
+
+            if (e.state == StoveCounter.State.Burned)
+            {
+                playWarningSound = false;
+            }
         }
 
         private void HandleProgressChanged(object sender, IHasProgress.ProgressChangedEventArgs e)
