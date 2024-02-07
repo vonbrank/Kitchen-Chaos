@@ -27,7 +27,7 @@ namespace Counters
 
         public Transform KitchenObjectFollowTransform => counterTopPoint;
 
-        public void SetKitchenObject(KitchenObject kitchenObject)
+        public virtual void SetKitchenObject(KitchenObject kitchenObject)
         {
             this.kitchenObject = kitchenObject;
             if (this.kitchenObject)
