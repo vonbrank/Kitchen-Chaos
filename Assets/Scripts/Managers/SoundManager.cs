@@ -29,7 +29,7 @@ namespace Managers
             DeliveryManager.Instance.OnRecipeSuccess += HandleRecipeSuccess;
             DeliveryManager.Instance.OnRecipeFailed += HandleRecipeFailed;
             CuttingCounter.OnAnyCut += HandleAnyCut;
-            // Player.Player.Instance.OnPlayerPickupSomething += HandlePlayerPickupSomething;
+            Player.Player.OnAnyPlayerPickupSomething += HandlePlayerPickupSomething;
             BaseCounter.OnAnyObjectPlaced += HandleAnyObjectPlaced;
             TrashCounter.OnAnyObjectTrashed += HandleAnyObjectTrashed;
         }
@@ -39,7 +39,7 @@ namespace Managers
             DeliveryManager.Instance.OnRecipeSuccess -= HandleRecipeSuccess;
             DeliveryManager.Instance.OnRecipeFailed -= HandleRecipeFailed;
             CuttingCounter.OnAnyCut -= HandleAnyCut;
-            // Player.Player.Instance.OnPlayerPickupSomething -= HandlePlayerPickupSomething;
+            Player.Player.OnAnyPlayerPickupSomething -= HandlePlayerPickupSomething;
             BaseCounter.OnAnyObjectPlaced -= HandleAnyObjectPlaced;
             TrashCounter.OnAnyObjectTrashed -= HandleAnyObjectTrashed;
         }
@@ -64,7 +64,10 @@ namespace Managers
 
         private void HandlePlayerPickupSomething(object sender, EventArgs e)
         {
-            // PlaySound(audioClipConfig.ObjectPickup, Player.Player.Instance.transform.position);
+            if (sender is Player.Player player)
+            {
+                PlaySound(audioClipConfig.ObjectPickup, player.transform.position);
+            }
         }
 
         private void HandleAnyObjectPlaced(object sender, EventArgs e)

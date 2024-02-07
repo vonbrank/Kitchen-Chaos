@@ -2,6 +2,7 @@ using System;
 using Counters;
 using KitchenObjects;
 using Managers;
+using Mono.CSharp;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,9 +10,36 @@ namespace Player
 {
     public class Player : NetworkBehaviour, IKitchenObjectParent
     {
-        // public static Player Instance { get; private set; }
+        private static Player localInstance;
 
-        public event EventHandler OnPlayerPickupSomething;
+        public static Player LocalInstance
+        {
+            get => localInstance;
+            set
+            {
+                var previousPlayer = localInstance;
+                localInstance = value;
+                var currentPlayer = localInstance;
+
+                Debug.Log($"OnLocalInstanceChanged: {currentPlayer}");
+
+                OnLocalInstanceChanged?.Invoke(null, new LocalInstanceChangedEventArgs
+                {
+                    PreviousPlayer = previousPlayer,
+                    CurrentPlayer = currentPlayer,
+                });
+            }
+        }
+
+        public static event EventHandler<LocalInstanceChangedEventArgs> OnLocalInstanceChanged;
+
+        public class LocalInstanceChangedEventArgs : EventArgs
+        {
+            public Player PreviousPlayer;
+            public Player CurrentPlayer;
+        }
+
+        public static event EventHandler OnAnyPlayerPickupSomething;
 
         [SerializeField] private float moveSpeed = 10f;
         [SerializeField] private float rotateSpeed = 10f;
@@ -34,6 +62,24 @@ namespace Player
             // Instance = this;
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (IsOwner)
+            {
+                LocalInstance = this;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            if (IsOwner)
+            {
+                LocalInstance = null;
+            }
+        }
+
         private void OnEnable()
         {
             InputManager.Instance.OnInteractAction += HandleInteractAction;
@@ -53,7 +99,7 @@ namespace Player
             {
                 return;
             }
-            
+
             HandleMovement();
             HandleInteractions();
         }
@@ -201,7 +247,7 @@ namespace Player
 
             if (this.kitchenObject)
             {
-                OnPlayerPickupSomething?.Invoke(this, EventArgs.Empty);
+                OnAnyPlayerPickupSomething?.Invoke(this, EventArgs.Empty);
             }
         }
 
