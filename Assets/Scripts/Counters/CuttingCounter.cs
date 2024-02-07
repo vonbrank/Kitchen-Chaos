@@ -28,7 +28,8 @@ namespace Counters
                     {
                         if (plateKitchenObject.TryAddIngredient(KitchenObject.KitchenObjectItem))
                         {
-                            KitchenObject.DestroySelf();
+                            KitchenObject.DestroyKitchenObject(KitchenObject);
+                            // KitchenObject.DestroySelf();
                         }
                     }
                 }

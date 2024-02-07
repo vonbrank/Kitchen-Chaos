@@ -52,12 +52,12 @@ namespace Managers
             // return kitchenObject;
         }
 
-        private int GetKitchenObjectItemIndex(KitchenObjectItem kitchenObjectItem)
+        public int GetKitchenObjectItemIndex(KitchenObjectItem kitchenObjectItem)
         {
             return kitchenObjectList.KitchenObjectItemList.IndexOf(kitchenObjectItem);
         }
 
-        private KitchenObjectItem GetKitchenObjectItemByIndex(int index)
+        public KitchenObjectItem GetKitchenObjectItemByIndex(int index)
         {
             return kitchenObjectList.KitchenObjectItemList[index];
         }
