@@ -32,12 +32,14 @@ namespace Counters
             KitchenGameManager.Instance.OnStateChanged -= HandleStateChanged;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
             if (currentSpawnPlatesHandler is not null)
             {
                 StopCoroutine(currentSpawnPlatesHandler);
             }
+
+            base.OnDestroy();
         }
 
         private IEnumerator HandleSpawnPlates()

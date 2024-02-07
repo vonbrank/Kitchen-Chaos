@@ -1,10 +1,11 @@
 using System;
 using KitchenObjects;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Counters
 {
-    public class BaseCounter : MonoBehaviour, IKitchenObjectParent
+    public class BaseCounter : NetworkBehaviour, IKitchenObjectParent
     {
         public static event EventHandler OnAnyObjectPlaced;
 
