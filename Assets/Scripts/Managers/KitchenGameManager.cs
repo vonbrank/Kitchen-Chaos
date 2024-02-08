@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using Utils;
@@ -71,6 +72,10 @@ namespace Managers
 
             state.OnValueChanged += HandleStateNetworkChanged;
             isNetworkGamePaused.OnValueChanged += HandleNetworkGamePausedChanged;
+            if (IsServer)
+            {
+                NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -79,6 +84,10 @@ namespace Managers
 
             state.OnValueChanged -= HandleStateNetworkChanged;
             isNetworkGamePaused.OnValueChanged -= HandleNetworkGamePausedChanged;
+            if (IsServer)
+            {
+                NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect;
+            }
         }
 
         private void ChangeState(State newState)
@@ -268,6 +277,22 @@ namespace Managers
                 OnNetworkGameResume?.Invoke(this, EventArgs.Empty);
                 Time.timeScale = 1;
             }
+        }
+
+        private async void HandleClientDisconnect(ulong clientId)
+        {
+            await UniTask.DelayFrame(1);
+            if (playerPausedDictionary.ContainsKey(clientId))
+            {
+                playerPausedDictionary.Remove(clientId);
+            }
+
+            if (playerReadyDictionary.ContainsKey(clientId))
+            {
+                playerReadyDictionary.Remove(clientId);
+            }
+
+            TestGamePausedState();
         }
     }
 }

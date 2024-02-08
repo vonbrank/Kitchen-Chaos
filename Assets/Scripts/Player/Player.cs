@@ -74,6 +74,11 @@ namespace Player
             }
 
             transform.position = spawnPositionList[(int)OwnerClientId];
+
+            if (IsServer)
+            {
+                NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -82,6 +87,11 @@ namespace Player
             if (IsOwner)
             {
                 LocalInstance = null;
+            }
+
+            if (IsServer)
+            {
+                NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect;
             }
         }
 
@@ -267,6 +277,17 @@ namespace Player
         public bool HasKitchenObject()
         {
             return kitchenObject is not null;
+        }
+
+        private void HandleClientDisconnect(ulong clientId)
+        {
+            if (clientId == OwnerClientId)
+            {
+                if (HasKitchenObject())
+                {
+                    KitchenObject.DestroyKitchenObject(KitchenObject);
+                }
+            }
         }
     }
 }

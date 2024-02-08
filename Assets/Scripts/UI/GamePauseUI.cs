@@ -1,5 +1,6 @@
 using System;
 using Managers;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -58,6 +59,7 @@ namespace UI
 
         private void HandleMainMenuButtonClick()
         {
+            NetworkManager.Singleton.Shutdown();
             SceneLoader.Load(SceneLoader.Scene.MainMenuScene);
             KitchenGameManager.Instance.TogglePauseGame();
         }
