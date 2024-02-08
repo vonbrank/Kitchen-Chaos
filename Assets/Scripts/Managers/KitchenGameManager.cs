@@ -1,15 +1,18 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using Utils;
 
 namespace Managers
 {
-    public class KitchenGameManager : StaticInstance<KitchenGameManager>
+    public class KitchenGameManager : NetworkStaticInstance<KitchenGameManager>
     {
         public event EventHandler<StateChangedEventArgs> OnStateChanged;
         public event EventHandler OnGamePaused;
         public event EventHandler OnGameResume;
+        public event EventHandler OnLocalPlayerReadyChanged;
 
         public class StateChangedEventArgs : EventArgs
         {
@@ -24,13 +27,16 @@ namespace Managers
             GameOver,
         }
 
-        private State state;
+        private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
         private float maxWaitingToStartTime = 1f;
         private float maxCountDownToStartTime = 3f;
-        private float resetCountDownTime;
-        private float playingTimerElapsed;
+        private NetworkVariable<float> restCountDownTime = new NetworkVariable<float>(0f);
+        private NetworkVariable<float> playingTimerElapsed = new NetworkVariable<float>(0f);
         [SerializeField] private float maxGamePlayTime = 180f;
         private bool isGamePaused;
+        private bool isLocalPlayerReady;
+        public bool IsLocalPlayerReady => isLocalPlayerReady;
+        private Dictionary<ulong, bool> playerReadyDictionary = new Dictionary<ulong, bool>();
 
         private void OnEnable()
         {
@@ -46,12 +52,35 @@ namespace Managers
 
         private void Start()
         {
-            ChangeState(State.WaitingToStart);
+            if (IsServer)
+            {
+                ChangeState(State.WaitingToStart);
+            }
 
-            DebugAutomaticStartGame();
+            // DebugAutomaticStartGame();
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            state.OnValueChanged += HandleStateNetworkChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+
+            state.OnValueChanged -= HandleStateNetworkChanged;
         }
 
         private void ChangeState(State newState)
+        {
+            ChangeStateServerRpc(newState);
+        }
+
+        [ServerRpc]
+        private void ChangeStateServerRpc(State newState)
         {
             switch (newState)
             {
@@ -68,12 +97,8 @@ namespace Managers
                     break;
             }
 
-            state = newState;
-            Debug.Log($"current state = {state.ToString()}");
-            OnStateChanged?.Invoke(this, new StateChangedEventArgs
-            {
-                state = state
-            });
+            state.Value = newState;
+            Debug.Log($"current state = {state.Value.ToString()}");
         }
 
         private IEnumerator HandleWaitingToStart()
@@ -90,11 +115,11 @@ namespace Managers
 
         private IEnumerator HandleCountDownToStart()
         {
-            resetCountDownTime = maxCountDownToStartTime;
-            while (resetCountDownTime > 0)
+            restCountDownTime.Value = maxCountDownToStartTime;
+            while (restCountDownTime.Value > 0)
             {
                 yield return null;
-                resetCountDownTime -= Time.deltaTime;
+                restCountDownTime.Value -= Time.deltaTime;
             }
 
             ChangeState(State.GamePlaying);
@@ -102,11 +127,11 @@ namespace Managers
 
         private IEnumerator HandleGamePlaying()
         {
-            playingTimerElapsed = 0f;
-            while (playingTimerElapsed < maxGamePlayTime)
+            playingTimerElapsed.Value = 0f;
+            while (playingTimerElapsed.Value < maxGamePlayTime)
             {
                 yield return null;
-                playingTimerElapsed += Time.deltaTime;
+                playingTimerElapsed.Value += Time.deltaTime;
             }
 
             ChangeState(State.GameOver);
@@ -133,16 +158,19 @@ namespace Managers
             }
         }
 
-        public bool IsGamePlaying => state == State.GamePlaying;
-        public bool IsCountingDownToStartActive => state == State.CountDownToStart;
-        public float ResetCountDownTime => resetCountDownTime;
-        public float GamePlayingTimeNormalized => playingTimerElapsed / maxGamePlayTime;
+        public bool IsGamePlaying => state.Value == State.GamePlaying;
+        public bool IsCountingDownToStartActive => state.Value == State.CountDownToStart;
+        public float RestCountDownTime => restCountDownTime.Value;
+        public float GamePlayingTimeNormalized => playingTimerElapsed.Value / maxGamePlayTime;
 
         private void HandleInteractAction(object sender, EventArgs e)
         {
-            if (state == State.WaitingToStart)
+            if (state.Value == State.WaitingToStart)
             {
-                ChangeState(State.CountDownToStart);
+                // ChangeState(State.CountDownToStart);
+                isLocalPlayerReady = true;
+                OnLocalPlayerReadyChanged?.Invoke(this, EventArgs.Empty);
+                SetPlayerReadyServerRpc();
             }
         }
 
@@ -150,6 +178,37 @@ namespace Managers
         {
             // maxCountDownToStartTime = 1f;
             ChangeState(State.CountDownToStart);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
+
+            bool allReady = true;
+            foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+            {
+                if (!playerReadyDictionary.ContainsKey(clientId) || playerReadyDictionary[clientId] == false)
+                {
+                    allReady = false;
+                    break;
+                }
+            }
+
+            Debug.Log($"all clients are ready = {allReady}");
+
+            if (allReady)
+            {
+                ChangeState(State.CountDownToStart);
+            }
+        }
+
+        private void HandleStateNetworkChanged(State previousValue, State newValue)
+        {
+            OnStateChanged?.Invoke(this, new StateChangedEventArgs
+            {
+                state = state.Value
+            });
         }
     }
 }

@@ -6,18 +6,17 @@ using KitchenObjects;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
+using Utils;
 using Random = UnityEngine.Random;
 
 namespace Managers
 {
-    public class DeliveryManager : NetworkBehaviour
+    public class DeliveryManager : NetworkStaticInstance<DeliveryManager>
     {
         public event EventHandler OnRecipeSpawned;
         public event EventHandler OnRecipeCompleted;
         public event EventHandler OnRecipeSuccess;
         public event EventHandler OnRecipeFailed;
-
-        public static DeliveryManager Instance { get; private set; }
 
         [SerializeField] private RecipeList recipeList;
         [SerializeField] private int maxWaitingRecipeAmount = 4;
@@ -29,17 +28,6 @@ namespace Managers
         public int SuccessfulRecipesAmount { get; private set; }
 
         private Coroutine spawnRecipeCoroutine;
-
-        private void Awake()
-        {
-            if (Instance)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-        }
 
         private void OnEnable()
         {

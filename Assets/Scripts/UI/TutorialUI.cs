@@ -22,12 +22,14 @@ namespace UI
         {
             InputManager.Instance.OnKeyRebind += HandleKeyRebind;
             KitchenGameManager.Instance.OnStateChanged += HandleStateChanged;
+            KitchenGameManager.Instance.OnLocalPlayerReadyChanged += HandleLocalPlayerReadyChanged;
         }
 
         private void OnDisable()
         {
             InputManager.Instance.OnKeyRebind -= HandleKeyRebind;
             KitchenGameManager.Instance.OnStateChanged -= HandleStateChanged;
+            KitchenGameManager.Instance.OnLocalPlayerReadyChanged -= HandleLocalPlayerReadyChanged;
         }
 
         private void HandleKeyRebind(object sender, EventArgs e)
@@ -76,7 +78,11 @@ namespace UI
                 UpdateVisual();
                 Show();
             }
-            else if (e.state == KitchenGameManager.State.CountDownToStart)
+        }
+
+        private void HandleLocalPlayerReadyChanged(object sender, EventArgs e)
+        {
+            if (KitchenGameManager.Instance.IsLocalPlayerReady)
             {
                 Hide();
             }
