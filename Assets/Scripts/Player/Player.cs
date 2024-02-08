@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Counters;
 using KitchenObjects;
 using Managers;
@@ -46,6 +47,8 @@ namespace Player
 
         // [SerializeField] private InputManager inputManager;
         [SerializeField] private LayerMask countersLayerMask;
+        [SerializeField] private LayerMask collisionsLayerMask;
+        [SerializeField] private List<Vector3> spawnPositionList;
 
         private Vector3 lastInteractDir;
         private BaseCounter selectedCounter;
@@ -69,6 +72,8 @@ namespace Player
             {
                 LocalInstance = this;
             }
+
+            transform.position = spawnPositionList[(int)OwnerClientId];
         }
 
         public override void OnNetworkDespawn()
@@ -183,21 +188,23 @@ namespace Player
             float playerRadius = 0.7f;
             float playerHeight = 2f;
 
-            bool canMove = (moveDir.magnitude > 0.5f) && !Physics.CapsuleCast(
+            bool canMove = (moveDir.magnitude > 0.5f) && !Physics.BoxCast(
                 transform.position,
-                transform.position + Vector3.up * playerHeight,
-                playerRadius,
+                Vector3.one * playerRadius,
                 moveDir,
-                moveDistance);
+                Quaternion.identity,
+                moveDistance,
+                collisionsLayerMask);
             if (!canMove)
             {
                 var moveDirX = new Vector3(inputVector.x, 0, 0).normalized;
-                canMove = !Physics.CapsuleCast(
+                canMove = !Physics.BoxCast(
                     transform.position,
-                    transform.position + Vector3.up * playerHeight,
-                    playerRadius,
+                    Vector3.one * playerRadius,
                     moveDirX,
-                    moveDistance);
+                    Quaternion.identity,
+                    moveDistance,
+                    collisionsLayerMask);
                 if (canMove)
                 {
                     moveDir = moveDirX;
@@ -205,12 +212,13 @@ namespace Player
                 else
                 {
                     var moveDirZ = new Vector3(0, 0, inputVector.y).normalized;
-                    canMove = !Physics.CapsuleCast(
+                    canMove = !Physics.BoxCast(
                         transform.position,
-                        transform.position + Vector3.up * playerHeight,
-                        playerRadius,
+                        Vector3.one * playerRadius,
                         moveDirZ,
-                        moveDistance);
+                        Quaternion.identity,
+                        moveDistance,
+                        collisionsLayerMask);
                     if (canMove)
                     {
                         moveDir = moveDirZ;
