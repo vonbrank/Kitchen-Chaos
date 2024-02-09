@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,15 +27,13 @@ namespace UI
 
         private void HandleHost()
         {
-            Debug.Log("Start Host...");
-            NetworkManager.Singleton.StartHost();
+            KitchenGameMultiplayerManager.Instance.StartHost();
             visualGameObjects.HideVisual();
         }
 
         private void HandleClient()
         {
-            Debug.Log("Start Client...");
-            NetworkManager.Singleton.StartClient();
+            KitchenGameMultiplayerManager.Instance.StartClient();
             visualGameObjects.HideVisual();
         }
     }

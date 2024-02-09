@@ -3,26 +3,61 @@ using KitchenObjects;
 using ScriptableObjects;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Utils;
 
 namespace Managers
 {
-    public class KitchenGameMultiplayerManager : NetworkBehaviour
+    public class KitchenGameMultiplayerManager : NetworkPersistentSingleton<KitchenGameMultiplayerManager>
     {
-        public static KitchenGameMultiplayerManager Instance { get; private set; }
+        private const int MAX_PLAYER_COUNT = 4;
+
+        public event EventHandler OnTryingToJoinGame;
+        public event EventHandler OnFailedToJoinGame;
 
         [SerializeField] private KitchenObjectList kitchenObjectList;
 
-        private void Awake()
+        public void StartHost()
         {
-            if (Instance)
+            NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApproval;
+            NetworkManager.Singleton.StartHost();
+            Debug.Log("Start Host...");
+        }
+
+        public void StartClient()
+        {
+            OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
+            NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnectCallback;
+            NetworkManager.Singleton.StartClient();
+            Debug.Log("Start Client...");
+        }
+
+        private void HandleClientDisconnectCallback(ulong obj)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnectCallback;
+            OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
+        }
+
+
+        private void HandleConnectionApproval(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
+            NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
+        {
+            if (SceneManager.GetActiveScene().name != SceneLoader.Scene.CharacterSelectScene.ToString())
             {
-                Destroy(gameObject);
+                connectionApprovalResponse.Approved = false;
+                connectionApprovalResponse.Reason = "Game has already started.";
                 return;
             }
 
-            Instance = this;
-        }
+            if (NetworkManager.Singleton.ConnectedClientsIds.Count == MAX_PLAYER_COUNT)
+            {
+                connectionApprovalResponse.Approved = false;
+                connectionApprovalResponse.Reason = "Game is full.";
+                return;
+            }
 
+            connectionApprovalResponse.Approved = true;
+        }
 
         public void SpawnKitchenObject(KitchenObjectItem kitchenObjectItem,
             IKitchenObjectParent kitchenObjectParent)
@@ -74,7 +109,7 @@ namespace Managers
             KitchenObject kitchenObject = kitchenObjectNetworkObject.GetComponent<KitchenObject>();
 
             ClearKitchenObjectOnParentClientRpc(kitchenObjectNetworkObjectReference);
-            
+
             kitchenObject.DestroySelf();
         }
 
@@ -83,7 +118,7 @@ namespace Managers
         {
             kitchenObjectNetworkObjectReference.TryGet(out NetworkObject kitchenObjectNetworkObject);
             KitchenObject kitchenObject = kitchenObjectNetworkObject.GetComponent<KitchenObject>();
-            
+
             kitchenObject.ClearKitchenObjectOnParent();
         }
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utils;
 
 namespace Managers
@@ -41,8 +42,10 @@ namespace Managers
         private NetworkVariable<bool> isNetworkGamePaused = new NetworkVariable<bool>(false);
         private bool isLocalPlayerReady;
         public bool IsLocalPlayerReady => isLocalPlayerReady;
+        public bool IsWaitingToStart => state.Value == State.WaitingToStart;
         private Dictionary<ulong, bool> playerReadyDictionary = new Dictionary<ulong, bool>();
         private Dictionary<ulong, bool> playerPausedDictionary = new Dictionary<ulong, bool>();
+        [SerializeField] private Transform playerPrefab;
 
         private void OnEnable()
         {
@@ -75,8 +78,10 @@ namespace Managers
             if (IsServer)
             {
                 NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
+                NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += HandleLoadEventCompleted;
             }
         }
+
 
         public override void OnNetworkDespawn()
         {
@@ -87,6 +92,19 @@ namespace Managers
             if (IsServer)
             {
                 NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect;
+                NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= HandleLoadEventCompleted;
+            }
+        }
+
+
+        private void HandleLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode,
+            List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+        {
+            foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+            {
+                var player = Instantiate(playerPrefab);
+                NetworkObject networkObject = player.GetComponent<NetworkObject>();
+                networkObject.SpawnAsPlayerObject(clientId, true);
             }
         }
 

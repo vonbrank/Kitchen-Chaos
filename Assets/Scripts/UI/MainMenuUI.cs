@@ -1,4 +1,6 @@
 using System;
+using Managers;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,6 +12,19 @@ namespace UI
     {
         [SerializeField] private Button playButton;
         [SerializeField] private Button quitButton;
+
+        private void Awake()
+        {
+            if (NetworkManager.Singleton)
+            {
+                Destroy(NetworkManager.Singleton.gameObject);
+            }
+
+            if (KitchenGameMultiplayerManager.Instance)
+            {
+                Destroy(KitchenGameMultiplayerManager.Instance.gameObject);
+            }
+        }
 
         private void OnEnable()
         {
@@ -30,7 +45,7 @@ namespace UI
 
         private void HandlePlay()
         {
-            SceneLoader.Load(SceneLoader.Scene.GameScene);
+            SceneLoader.Load(SceneLoader.Scene.LobbyScene);
         }
 
         private void HandleQuit()
