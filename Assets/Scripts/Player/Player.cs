@@ -49,6 +49,7 @@ namespace Player
         [SerializeField] private LayerMask countersLayerMask;
         [SerializeField] private LayerMask collisionsLayerMask;
         [SerializeField] private List<Vector3> spawnPositionList;
+        [SerializeField] private PlayerVisual playerVisual;
 
         private Vector3 lastInteractDir;
         private BaseCounter selectedCounter;
@@ -73,7 +74,8 @@ namespace Player
                 LocalInstance = this;
             }
 
-            transform.position = spawnPositionList[(int)OwnerClientId];
+            transform.position =
+                spawnPositionList[KitchenGameMultiplayerManager.Instance.GetPlayerDataIndexByClientId(OwnerClientId)];
 
             if (IsServer)
             {
@@ -107,6 +109,13 @@ namespace Player
             InputManager.Instance.OnInteractAlternateAction -= HandleInteractAlternateAction;
         }
 
+
+        private void Start()
+        {
+            PlayerData playerData = KitchenGameMultiplayerManager.Instance.GetPlayerDataByClientId(OwnerClientId);
+            Color playerColor = KitchenGameMultiplayerManager.Instance.GetPlayerColor(playerData.ColorIndex);
+            playerVisual.SetPlayerColor(playerColor);
+        }
 
         private void Update()
         {

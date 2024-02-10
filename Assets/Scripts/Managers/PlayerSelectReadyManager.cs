@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,7 +8,8 @@ namespace Managers
 {
     public class PlayerSelectReadyManager : NetworkSingleton<PlayerSelectReadyManager>
     {
-        private Dictionary<ulong, bool> playerReadyDictionary = new Dictionary<ulong, bool>();
+        private Dictionary<ulong, bool> playerSelectReadyDictionary = new Dictionary<ulong, bool>();
+        public event EventHandler OnPlayerReadyChanged;
 
         public void PlayerSelectReady()
         {
@@ -17,13 +19,15 @@ namespace Managers
         [ServerRpc(RequireOwnership = false)]
         private void PlayerSelectReadyServerRpc(ServerRpcParams serverRpcParams = default)
         {
-            playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
+            playerSelectReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
+            SelectPlayerReadyClientRpc(serverRpcParams.Receive.SenderClientId);
 
             bool allReady = true;
             int readyClientCount = 0;
             foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
             {
-                if (!playerReadyDictionary.ContainsKey(clientId) || playerReadyDictionary[clientId] == false)
+                if (!playerSelectReadyDictionary.ContainsKey(clientId) ||
+                    playerSelectReadyDictionary[clientId] == false)
                 {
                     allReady = false;
                 }
@@ -40,6 +44,18 @@ namespace Managers
             {
                 SceneLoader.LoadNetwork(SceneLoader.Scene.GameScene);
             }
+        }
+
+        [ClientRpc]
+        private void SelectPlayerReadyClientRpc(ulong clientId)
+        {
+            playerSelectReadyDictionary[clientId] = true;
+            OnPlayerReadyChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool IsPlayerReady(ulong clientId)
+        {
+            return playerSelectReadyDictionary.ContainsKey(clientId) && playerSelectReadyDictionary[clientId];
         }
     }
 }
