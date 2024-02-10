@@ -1,6 +1,8 @@
 using System;
 using Managers;
+using TMPro;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -11,6 +13,8 @@ namespace UI
     {
         [SerializeField] private Button mainMenuButton;
         [SerializeField] private Button readyButton;
+        [SerializeField] private TextMeshProUGUI lobbyNameText;
+        [SerializeField] private TextMeshProUGUI lobbyCodeText;
 
         private void OnEnable()
         {
@@ -24,8 +28,18 @@ namespace UI
             readyButton.onClick.RemoveListener(HandleReadyButtonClick);
         }
 
+
+        private void Start()
+        {
+            Lobby lobby = KitchenGameLobbyManager.Instance.JoinedLobby;
+
+            lobbyNameText.text = $"Lobby Name: {lobby.Name}";
+            lobbyCodeText.text = $"Lobby Code: {lobby.LobbyCode}";
+        }
+
         private void HandleMainMenuButtonClick()
         {
+            KitchenGameLobbyManager.Instance.LeaveLobby();
             NetworkManager.Singleton.Shutdown();
             SceneLoader.Load(SceneLoader.Scene.MainMenuScene);
         }

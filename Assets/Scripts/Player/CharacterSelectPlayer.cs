@@ -1,5 +1,6 @@
 using System;
 using Managers;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,7 @@ namespace Player
         [SerializeField] private GameObject readyTextGameObject;
         [SerializeField] private PlayerVisual playerVisual;
         [SerializeField] private Button kickOffButton;
+        [SerializeField] private TextMeshPro playerNameText;
 
         private void OnEnable()
         {
@@ -40,6 +42,7 @@ namespace Player
                     KitchenGameMultiplayerManager.Instance.GetPlayerColor(playerData.ColorIndex));
                 kickOffButton.gameObject.SetActive(NetworkManager.Singleton.IsServer &&
                                                    playerData.ClientId != NetworkManager.ServerClientId);
+                playerNameText.text = playerData.playerName.ToString();
                 Show();
             }
             else
@@ -64,6 +67,7 @@ namespace Player
         private void HandleKickOffButtonClick()
         {
             PlayerData playerData = KitchenGameMultiplayerManager.Instance.GetPlayerDataByIndex(playerIndex);
+            KitchenGameLobbyManager.Instance.KickOffPlayer(playerData.playerLobbyId.ToString());
             KitchenGameMultiplayerManager.Instance.KickOffPlayer(playerData.ClientId);
         }
 

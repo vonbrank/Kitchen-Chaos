@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using KitchenObjects;
 using Player;
 using ScriptableObjects;
+using Unity.Collections;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using Utils;
+using Random = UnityEngine.Random;
 
 namespace Managers
 {
     public class KitchenGameMultiplayerManager : NetworkPersistentSingleton<KitchenGameMultiplayerManager>
     {
-        private const int MAX_PLAYER_COUNT = 4;
+        public const int MAX_PLAYER_COUNT = 4;
+        private const string PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
 
         public event EventHandler OnTryingToJoinGame;
         public event EventHandler OnFailedToJoinGame;
@@ -25,12 +29,16 @@ namespace Managers
         public IReadOnlyList<Color> PlayerColorList => playerColorList;
 
         private NetworkList<PlayerData> playerDataNetworkList;
+        private string playerName;
+        public string PlayerName => playerName;
 
         protected override void Awake()
         {
             base.Awake();
 
             playerDataNetworkList = new NetworkList<PlayerData>();
+            playerName = PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER,
+                $"PlayerName{Random.Range(1000, 10000)}");
         }
 
         private void OnEnable()
@@ -46,7 +54,7 @@ namespace Managers
         public void StartHost()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApproval;
-            NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnectedCallback;
+            NetworkManager.Singleton.OnClientConnectedCallback += HandleStartServerClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleStartServerClientDisconnectCallback;
             NetworkManager.Singleton.StartHost();
             Debug.Log("Start Host...");
@@ -56,25 +64,53 @@ namespace Managers
         public void StartClient()
         {
             OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
+            NetworkManager.Singleton.OnClientConnectedCallback += HandleStartClientClientConnectCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleStartClientClientDisconnectCallback;
             NetworkManager.Singleton.StartClient();
             Debug.Log("Start Client...");
         }
 
-        private void HandleStartClientClientDisconnectCallback(ulong obj)
+        private void HandleStartClientClientConnectCallback(ulong clientId)
+        {
+            SetPlayerNameServerRpc(PlayerName);
+            SetPlayerLobbyIdServerRpc(AuthenticationService.Instance.PlayerId);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetPlayerNameServerRpc(FixedString64Bytes newPlayerName, ServerRpcParams serverRpcParams = default)
+        {
+            int playerDataIndex = GetPlayerDataIndexByClientId(serverRpcParams.Receive.SenderClientId);
+            PlayerData newPlayerData = playerDataNetworkList[playerDataIndex];
+            newPlayerData.playerName = newPlayerName;
+            playerDataNetworkList[playerDataIndex] = newPlayerData;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetPlayerLobbyIdServerRpc(FixedString64Bytes playerLobbyId,
+            ServerRpcParams serverRpcParams = default)
+        {
+            int playerDataIndex = GetPlayerDataIndexByClientId(serverRpcParams.Receive.SenderClientId);
+            PlayerData newPlayerData = playerDataNetworkList[playerDataIndex];
+            newPlayerData.playerLobbyId = playerLobbyId;
+            playerDataNetworkList[playerDataIndex] = newPlayerData;
+        }
+
+        private void HandleStartClientClientDisconnectCallback(ulong clientId)
         {
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleStartClientClientDisconnectCallback;
             OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
         }
 
 
-        private void HandleClientConnectedCallback(ulong clientId)
+        private void HandleStartServerClientConnectedCallback(ulong clientId)
         {
             playerDataNetworkList.Add(new PlayerData
             {
                 ClientId = clientId,
                 ColorIndex = GetFirstAvailableColorIndex()
             });
+            SetPlayerNameServerRpc(PlayerName);
+            SetPlayerLobbyIdServerRpc(AuthenticationService.Instance.PlayerId);
         }
 
         private void HandleStartServerClientDisconnectCallback(ulong clientId)
@@ -279,6 +315,12 @@ namespace Managers
         {
             NetworkManager.Singleton.DisconnectClient(clientId);
             HandleStartServerClientDisconnectCallback(clientId);
+        }
+
+        public void SetPlayerName(string newPlayerName)
+        {
+            playerName = newPlayerName;
+            PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, newPlayerName);
         }
     }
 }

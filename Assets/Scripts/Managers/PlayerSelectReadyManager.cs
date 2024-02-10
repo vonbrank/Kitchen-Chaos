@@ -42,6 +42,7 @@ namespace Managers
 
             if (allReady)
             {
+                KitchenGameLobbyManager.Instance.DeleteLobby();
                 SceneLoader.LoadNetwork(SceneLoader.Scene.GameScene);
             }
         }

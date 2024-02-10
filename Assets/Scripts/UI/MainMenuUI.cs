@@ -15,15 +15,7 @@ namespace UI
 
         private void Awake()
         {
-            if (NetworkManager.Singleton)
-            {
-                Destroy(NetworkManager.Singleton.gameObject);
-            }
-
-            if (KitchenGameMultiplayerManager.Instance)
-            {
-                Destroy(KitchenGameMultiplayerManager.Instance.gameObject);
-            }
+            CleanUp();
         }
 
         private void OnEnable()
@@ -51,6 +43,24 @@ namespace UI
         private void HandleQuit()
         {
             Application.Quit();
+        }
+
+        private void CleanUp()
+        {
+            if (NetworkManager.Singleton)
+            {
+                Destroy(NetworkManager.Singleton.gameObject);
+            }
+
+            if (KitchenGameMultiplayerManager.Instance)
+            {
+                Destroy(KitchenGameMultiplayerManager.Instance.gameObject);
+            }
+
+            if (KitchenGameLobbyManager.Instance)
+            {
+                Destroy(KitchenGameLobbyManager.Instance.gameObject);
+            }
         }
     }
 }
