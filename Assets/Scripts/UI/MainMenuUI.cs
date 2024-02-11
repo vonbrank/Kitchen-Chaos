@@ -10,7 +10,8 @@ namespace UI
 {
     public class MainMenuUI : MonoBehaviour
     {
-        [SerializeField] private Button playButton;
+        [SerializeField] private Button singlePlayerButton;
+        [SerializeField] private Button multiplayerButton;
         [SerializeField] private Button quitButton;
 
         private void Awake()
@@ -20,23 +21,32 @@ namespace UI
 
         private void OnEnable()
         {
-            playButton.onClick.AddListener(HandlePlay);
+            singlePlayerButton.onClick.AddListener(HandleSinglePlayer);
+            multiplayerButton.onClick.AddListener(HandleMultiplayer);
             quitButton.onClick.AddListener(HandleQuit);
         }
 
         private void OnDisable()
         {
-            playButton.onClick.RemoveListener(HandlePlay);
+            singlePlayerButton.onClick.RemoveListener(HandleSinglePlayer);
+            multiplayerButton.onClick.RemoveListener(HandleMultiplayer);
             quitButton.onClick.RemoveListener(HandleQuit);
         }
 
         private void Start()
         {
-            playButton.Select();
+            singlePlayerButton.Select();
         }
 
-        private void HandlePlay()
+        private void HandleSinglePlayer()
         {
+            KitchenGameMultiplayerManager.PlayMultiplayer = false;
+            SceneLoader.Load(SceneLoader.Scene.LobbyScene);
+        }
+
+        private void HandleMultiplayer()
+        {
+            KitchenGameMultiplayerManager.PlayMultiplayer = true;
             SceneLoader.Load(SceneLoader.Scene.LobbyScene);
         }
 

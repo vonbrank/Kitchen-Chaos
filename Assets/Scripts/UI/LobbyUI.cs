@@ -45,6 +45,10 @@ namespace UI
         private void Start()
         {
             playerNameInputField.text = KitchenGameMultiplayerManager.Instance.PlayerName;
+            if (!KitchenGameMultiplayerManager.PlayMultiplayer)
+            {
+                Hide();
+            }
         }
 
         private void HandleMainMenuButtonClick()

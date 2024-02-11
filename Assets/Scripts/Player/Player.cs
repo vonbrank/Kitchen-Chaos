@@ -112,9 +112,12 @@ namespace Player
 
         private void Start()
         {
-            PlayerData playerData = KitchenGameMultiplayerManager.Instance.GetPlayerDataByClientId(OwnerClientId);
-            Color playerColor = KitchenGameMultiplayerManager.Instance.GetPlayerColor(playerData.ColorIndex);
-            playerVisual.SetPlayerColor(playerColor);
+            if (KitchenGameMultiplayerManager.PlayMultiplayer)
+            {
+                PlayerData playerData = KitchenGameMultiplayerManager.Instance.GetPlayerDataByClientId(OwnerClientId);
+                Color playerColor = KitchenGameMultiplayerManager.Instance.GetPlayerColor(playerData.ColorIndex);
+                playerVisual.SetPlayerColor(playerColor);
+            }
         }
 
         private void Update()

@@ -5,6 +5,7 @@ using Player;
 using ScriptableObjects;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,6 +19,8 @@ namespace Managers
     {
         public const int MAX_PLAYER_COUNT = 4;
         private const string PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
+        private const string LOCALHOST_IPV4 = "127.0.0.1";
+        private const int LOCALHOST_PORT = 7777;
 
         public event EventHandler OnTryingToJoinGame;
         public event EventHandler OnFailedToJoinGame;
@@ -31,6 +34,8 @@ namespace Managers
         private NetworkList<PlayerData> playerDataNetworkList;
         private string playerName;
         public string PlayerName => playerName;
+
+        public static bool PlayMultiplayer { get; set; }
 
         protected override void Awake()
         {
@@ -49,6 +54,17 @@ namespace Managers
         private void OnDisable()
         {
             playerDataNetworkList.OnListChanged -= HandlePlayerDataNetworkListChanged;
+        }
+
+        private void Start()
+        {
+            if (!PlayMultiplayer)
+            {
+                NetworkManager.Singleton.GetComponent<UnityTransport>()
+                    .SetConnectionData(LOCALHOST_IPV4, LOCALHOST_PORT);
+                StartHost();
+                SceneLoader.LoadNetwork(SceneLoader.Scene.GameScene);
+            }
         }
 
         public void StartHost()
