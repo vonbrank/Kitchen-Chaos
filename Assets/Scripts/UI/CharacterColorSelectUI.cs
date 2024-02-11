@@ -1,6 +1,7 @@
 using System;
 using Managers;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -17,6 +18,10 @@ namespace UI
                     Instantiate(colorButtonTemplate, colorButtonsTransform);
                 characterSelectColorButtonUI.ColorIndex = i;
                 characterSelectColorButtonUI.gameObject.SetActive(true);
+                if (i == 0)
+                {
+                    characterSelectColorButtonUI.GetComponent<Button>().Select();
+                }
             }
         }
     }

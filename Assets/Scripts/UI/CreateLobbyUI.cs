@@ -61,6 +61,7 @@ namespace UI
         public void Show()
         {
             visualGameObjects.ShowVisual();
+            createPublicButton.Select();
         }
     }
 }

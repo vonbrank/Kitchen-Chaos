@@ -35,7 +35,7 @@ namespace Managers
         private string playerName;
         public string PlayerName => playerName;
 
-        public static bool PlayMultiplayer { get; set; }
+        public static bool PlayMultiplayer { get; set; } = true;
 
         protected override void Awake()
         {
@@ -125,8 +125,11 @@ namespace Managers
                 ClientId = clientId,
                 ColorIndex = GetFirstAvailableColorIndex()
             });
-            SetPlayerNameServerRpc(PlayerName);
-            SetPlayerLobbyIdServerRpc(AuthenticationService.Instance.PlayerId);
+            if (PlayMultiplayer)
+            {
+                SetPlayerNameServerRpc(PlayerName);
+                SetPlayerLobbyIdServerRpc(AuthenticationService.Instance.PlayerId);
+            }
         }
 
         private void HandleStartServerClientDisconnectCallback(ulong clientId)

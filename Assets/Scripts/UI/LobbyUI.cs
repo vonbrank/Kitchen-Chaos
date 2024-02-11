@@ -49,6 +49,7 @@ namespace UI
             {
                 Hide();
             }
+            createLobbyButton.Select();
         }
 
         private void HandleMainMenuButtonClick()
@@ -78,6 +79,7 @@ namespace UI
         {
             createLobbyUI.OnClose -= HandleCreateLobbyUIClose;
             Show();
+            createLobbyButton.Select();
         }
 
         private void HandlePlayerNameInputValueChanged(string newValue)
