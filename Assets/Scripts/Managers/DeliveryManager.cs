@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using KitchenObjects;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
 using Utils;
 using Random = UnityEngine.Random;
 
 namespace Managers
 {
-    public class DeliveryManager : StaticInstance<DeliveryManager>
+    public class DeliveryManager : NetworkStaticInstance<DeliveryManager>
     {
         public event EventHandler OnRecipeSpawned;
         public event EventHandler OnRecipeCompleted;
@@ -38,20 +39,22 @@ namespace Managers
             KitchenGameManager.Instance.OnStateChanged -= HandleStateChanged;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
             if (spawnRecipeCoroutine is not null)
             {
                 StopCoroutine(spawnRecipeCoroutine);
             }
         }
 
-        private void Start()
-        {
-        }
-
         private IEnumerator HandleSpawnRecipe()
         {
+            if (!IsServer)
+            {
+                yield break;
+            }
+
             while (true)
             {
                 var timeElapsed = 0f;
@@ -63,13 +66,20 @@ namespace Managers
 
                 if (waitingRecipeList.Count < maxWaitingRecipeAmount)
                 {
-                    var waitingRecipeItem = recipeList.RecipeItemList[Random.Range(0, recipeList.RecipeItemList.Count)];
-                    Debug.Log($"Recipe {waitingRecipeItem.RecipeName} spawned.");
-                    waitingRecipeList.Add(waitingRecipeItem);
-
-                    OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+                    int waitingRecipeItemIndex = Random.Range(0, recipeList.RecipeItemList.Count);
+                    SpawnNewWaitingRecipeClientRpc(waitingRecipeItemIndex);
                 }
             }
+        }
+
+        [ClientRpc]
+        private void SpawnNewWaitingRecipeClientRpc(int waitingRecipeItemIndex)
+        {
+            var waitingRecipeItem = recipeList.RecipeItemList[waitingRecipeItemIndex];
+            Debug.Log($"Recipe {waitingRecipeItem.RecipeName} spawned.");
+            waitingRecipeList.Add(waitingRecipeItem);
+
+            OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
         }
 
         public void DeliverRecipe(PlateKitchenObject plateKitchenObject)
@@ -101,18 +111,42 @@ namespace Managers
 
             if (matchIndex != -1)
             {
-                waitingRecipeList.RemoveAt(matchIndex);
-
-                SuccessfulRecipesAmount++;
-
-                OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
-                OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
+                DeliverCorrectRecipeServerRpc(matchIndex);
             }
             else
             {
-                Debug.LogWarning($"Player delivered a wrong recipe");
-                OnRecipeFailed?.Invoke(this, EventArgs.Empty);
+                DeliverInCorrectRecipeServerRpc();
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void DeliverCorrectRecipeServerRpc(int matchIndex)
+        {
+            DeliverCorrectRecipeClientRpc(matchIndex);
+        }
+
+        [ClientRpc]
+        private void DeliverCorrectRecipeClientRpc(int matchIndex)
+        {
+            waitingRecipeList.RemoveAt(matchIndex);
+
+            SuccessfulRecipesAmount++;
+
+            OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+            OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void DeliverInCorrectRecipeServerRpc()
+        {
+            DeliverInCorrectRecipeClientRpc();
+        }
+
+        [ClientRpc]
+        private void DeliverInCorrectRecipeClientRpc()
+        {
+            Debug.LogWarning($"Player delivered a wrong recipe");
+            OnRecipeFailed?.Invoke(this, EventArgs.Empty);
         }
 
         private void HandleStateChanged(object sender, KitchenGameManager.StateChangedEventArgs e)

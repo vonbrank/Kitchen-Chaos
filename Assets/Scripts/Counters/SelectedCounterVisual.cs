@@ -10,12 +10,12 @@ namespace Counters
 
         private void OnEnable()
         {
-            Player.Player.Instance.OnSelectedCounterChanged += HandleSelectedCounterChange;
+            Player.Player.OnLocalInstanceChanged += HandlePlayerLocalInstanceChanged;
         }
 
         private void OnDisable()
         {
-            Player.Player.Instance.OnSelectedCounterChanged -= HandleSelectedCounterChange;
+            Player.Player.OnLocalInstanceChanged -= HandlePlayerLocalInstanceChanged;
         }
 
         private void HandleSelectedCounterChange(object sender, Player.Player.SelectedCounterChangedEventArgs e)
@@ -27,6 +27,19 @@ namespace Counters
             else
             {
                 Hide();
+            }
+        }
+
+        private void HandlePlayerLocalInstanceChanged(object sender, Player.Player.LocalInstanceChangedEventArgs e)
+        {
+            if (e.PreviousPlayer is not null)
+            {
+                e.PreviousPlayer.OnSelectedCounterChanged -= HandleSelectedCounterChange;
+            }
+
+            if (e.CurrentPlayer is not null)
+            {
+                e.CurrentPlayer.OnSelectedCounterChanged += HandleSelectedCounterChange;
             }
         }
 

@@ -1,5 +1,6 @@
 using System;
 using Managers;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -16,8 +17,8 @@ namespace UI
 
         private void OnEnable()
         {
-            KitchenGameManager.Instance.OnGamePaused += HandleGamePaused;
-            KitchenGameManager.Instance.OnGameResume += HandleGameResume;
+            KitchenGameManager.Instance.OnLocalGamePaused += HandleLocalGamePaused;
+            KitchenGameManager.Instance.OnLocalGameResume += HandleLocalGameResume;
 
             resumeButton.onClick.AddListener(HandleResumeButtonClick);
             mainMenuButton.onClick.AddListener(HandleMainMenuButtonClick);
@@ -26,8 +27,8 @@ namespace UI
 
         private void OnDisable()
         {
-            KitchenGameManager.Instance.OnGamePaused -= HandleGamePaused;
-            KitchenGameManager.Instance.OnGameResume -= HandleGameResume;
+            KitchenGameManager.Instance.OnLocalGamePaused -= HandleLocalGamePaused;
+            KitchenGameManager.Instance.OnLocalGameResume -= HandleLocalGameResume;
 
             resumeButton.onClick.RemoveListener(HandleResumeButtonClick);
             mainMenuButton.onClick.RemoveListener(HandleMainMenuButtonClick);
@@ -39,12 +40,12 @@ namespace UI
             Hide();
         }
 
-        private void HandleGamePaused(object sender, EventArgs e)
+        private void HandleLocalGamePaused(object sender, EventArgs e)
         {
             Show();
         }
 
-        private void HandleGameResume(object sender, EventArgs e)
+        private void HandleLocalGameResume(object sender, EventArgs e)
         {
             Hide();
         }
@@ -58,6 +59,7 @@ namespace UI
 
         private void HandleMainMenuButtonClick()
         {
+            NetworkManager.Singleton.Shutdown();
             SceneLoader.Load(SceneLoader.Scene.MainMenuScene);
             KitchenGameManager.Instance.TogglePauseGame();
         }

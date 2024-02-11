@@ -1,6 +1,7 @@
 using System;
 using KitchenObjects;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -27,7 +28,8 @@ namespace Counters
                     {
                         if (plateKitchenObject.TryAddIngredient(KitchenObject.KitchenObjectItem))
                         {
-                            KitchenObject.DestroySelf();
+                            KitchenObject.DestroyKitchenObject(KitchenObject);
+                            // KitchenObject.DestroySelf();
                         }
                     }
                 }
@@ -43,8 +45,6 @@ namespace Counters
                     if (HasRecipeWithInput(player.KitchenObject.KitchenObjectItem))
                     {
                         player.KitchenObject.SetKitchenObjectParent(this);
-
-                        SetCuttingProgress(0);
                     }
                 }
                 else
@@ -53,23 +53,41 @@ namespace Counters
             }
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        private void CutObjectServerRpc()
+        {
+            CutObjectClientRpc();
+        }
+
+        [ClientRpc]
+        private void CutObjectClientRpc()
+        {
+            OnCut?.Invoke(this, EventArgs.Empty);
+            OnAnyCut?.Invoke(this, EventArgs.Empty);
+            SetCuttingProgress(cuttingProgress + 1);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void TestCuttingProgressDoneServerRpc()
+        {
+            CuttingRecipe cuttingRecipe = GetCuttingRecipeFromInput(KitchenObject.KitchenObjectItem);
+            if (cuttingProgress >= cuttingRecipe.maxCuttingProgress)
+            {
+                KitchenObjectItem outputKitchenObjectItem = GetOutputFromInput(KitchenObject.KitchenObjectItem);
+
+                KitchenObject.DestroyKitchenObject(KitchenObject);
+                // KitchenObject.DestroySelf();
+
+                KitchenObject.SpawnKitchenObject(outputKitchenObjectItem, this);
+            }
+        }
+
         public override void InteractAlternate(Player.Player player)
         {
             if (HasKitchenObject() && HasRecipeWithInput(KitchenObject.KitchenObjectItem))
             {
-                CuttingRecipe cuttingRecipe = GetCuttingRecipeFromInput(KitchenObject.KitchenObjectItem);
-
-                OnCut?.Invoke(this, EventArgs.Empty);
-                OnAnyCut?.Invoke(this, EventArgs.Empty);
-                SetCuttingProgress(cuttingProgress + 1);
-
-                if (cuttingProgress >= cuttingRecipe.maxCuttingProgress)
-                {
-                    KitchenObjectItem outputKitchenObjectItem = GetOutputFromInput(KitchenObject.KitchenObjectItem);
-                    KitchenObject.DestroySelf();
-
-                    KitchenObject.SpawnKitchenObject(outputKitchenObjectItem, this);
-                }
+                CutObjectServerRpc();
+                TestCuttingProgressDoneServerRpc();
             }
         }
 
@@ -105,12 +123,28 @@ namespace Counters
 
         private void SetCuttingProgress(int newProgress)
         {
-            CuttingRecipe cuttingRecipe = GetCuttingRecipeFromInput(KitchenObject.KitchenObjectItem);
+            float maxCuttingProgress = 1;
+            if (KitchenObject)
+            {
+                CuttingRecipe cuttingRecipe = GetCuttingRecipeFromInput(KitchenObject.KitchenObjectItem);
+                if (cuttingRecipe)
+                {
+                    maxCuttingProgress = cuttingRecipe.maxCuttingProgress;
+                }
+            }
+
             cuttingProgress = newProgress;
             OnProgressChanged?.Invoke(this, new IHasProgress.ProgressChangedEventArgs()
             {
-                progressNormalized = (float)cuttingProgress / cuttingRecipe.maxCuttingProgress
+                progressNormalized = (float)cuttingProgress / maxCuttingProgress
             });
+        }
+
+        public override void SetKitchenObject(KitchenObject kitchenObject)
+        {
+            base.SetKitchenObject(kitchenObject);
+
+            SetCuttingProgress(0);
         }
     }
 }

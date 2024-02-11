@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Managers;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace KitchenObjects
@@ -32,12 +34,29 @@ namespace KitchenObjects
                 return false;
             }
 
+            var kitchenObjectItemIndex =
+                KitchenGameMultiplayerManager.Instance.GetKitchenObjectItemIndex(kitchenObjectItem);
+            AddIngredientServerRpc(kitchenObjectItemIndex);
+
+            return true;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void AddIngredientServerRpc(int kitchenObjectItemIndex)
+        {
+            AddIngredientClientRpc(kitchenObjectItemIndex);
+        }
+
+        [ClientRpc]
+        private void AddIngredientClientRpc(int kitchenObjectItemIndex)
+        {
+            var kitchenObjectItem =
+                KitchenGameMultiplayerManager.Instance.GetKitchenObjectItemByIndex(kitchenObjectItemIndex);
             kitchenObjectItems.Add(kitchenObjectItem);
             OnIngredientAdded?.Invoke(this, new IngredientAddedEventArgs
             {
                 KitchenObjectItem = kitchenObjectItem
             });
-            return true;
         }
     }
 }

@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 namespace KitchenObjects
@@ -7,6 +8,8 @@ namespace KitchenObjects
         public Transform KitchenObjectFollowTransform { get; }
 
         public KitchenObject KitchenObject { get; }
+
+        public NetworkObject NetworkObject { get; }
 
         public void SetKitchenObject(KitchenObject kitchenObject);
 

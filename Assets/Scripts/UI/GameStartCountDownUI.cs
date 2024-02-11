@@ -39,7 +39,7 @@ namespace UI
         {
             if (KitchenGameManager.Instance.IsCountingDownToStartActive)
             {
-                int currentCountDownNumber = Mathf.CeilToInt(KitchenGameManager.Instance.ResetCountDownTime);
+                int currentCountDownNumber = Mathf.CeilToInt(KitchenGameManager.Instance.RestCountDownTime);
                 if (currentCountDownNumber != previousCountDownNumber)
                 {
                     animator.SetTrigger(NUMBER_POPUP);

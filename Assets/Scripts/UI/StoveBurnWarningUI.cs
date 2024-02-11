@@ -10,11 +10,13 @@ namespace UI
 
         private void OnEnable()
         {
+            stoveCounter.OnStateChanged += HandleStateChanged;
             stoveCounter.OnProgressChanged += HandleProgressChanged;
         }
 
         private void OnDisable()
         {
+            stoveCounter.OnStateChanged -= HandleStateChanged;
             stoveCounter.OnProgressChanged -= HandleProgressChanged;
         }
 
@@ -33,6 +35,14 @@ namespace UI
                 Show();
             }
             else
+            {
+                Hide();
+            }
+        }
+
+        private void HandleStateChanged(object sender, StoveCounter.StateChangedEventArgs e)
+        {
+            if (e.state == StoveCounter.State.Burned)
             {
                 Hide();
             }

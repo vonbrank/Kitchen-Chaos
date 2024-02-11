@@ -1,10 +1,11 @@
 using System;
 using KitchenObjects;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Counters
 {
-    public class BaseCounter : MonoBehaviour, IKitchenObjectParent
+    public class BaseCounter : NetworkBehaviour, IKitchenObjectParent
     {
         public static event EventHandler OnAnyObjectPlaced;
 
@@ -26,7 +27,7 @@ namespace Counters
 
         public Transform KitchenObjectFollowTransform => counterTopPoint;
 
-        public void SetKitchenObject(KitchenObject kitchenObject)
+        public virtual void SetKitchenObject(KitchenObject kitchenObject)
         {
             this.kitchenObject = kitchenObject;
             if (this.kitchenObject)

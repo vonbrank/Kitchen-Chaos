@@ -3,6 +3,7 @@ using System.Collections;
 using KitchenObjects;
 using Managers;
 using ScriptableObjects;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Counters
@@ -32,16 +33,23 @@ namespace Counters
             KitchenGameManager.Instance.OnStateChanged -= HandleStateChanged;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
             if (currentSpawnPlatesHandler is not null)
             {
                 StopCoroutine(currentSpawnPlatesHandler);
             }
+
+            base.OnDestroy();
         }
 
         private IEnumerator HandleSpawnPlates()
         {
+            if (!IsServer)
+            {
+                yield break;
+            }
+
             while (true)
             {
                 float timeElapsed = 0;
@@ -53,14 +61,26 @@ namespace Counters
 
                 if (currentSpawnedPlatesAmount < maxSpawnedPlatesAmount)
                 {
-                    currentSpawnedPlatesAmount++;
-                    OnPlateSpawned?.Invoke(this, new PlateSpawnedEventArgs
-                    {
-                        currentSpawnedPlatesAmount = currentSpawnedPlatesAmount
-                    });
-                    // DefaultNamespace.KitchenObject.SpawnKitchenObject(plateKitchenObjectItem, this);
+                    SpawnPlateServerRpc();
                 }
             }
+        }
+
+        [ServerRpc]
+        private void SpawnPlateServerRpc()
+        {
+            SpawnPlateClientRpc();
+        }
+
+        [ClientRpc]
+        private void SpawnPlateClientRpc()
+        {
+            currentSpawnedPlatesAmount++;
+            OnPlateSpawned?.Invoke(this, new PlateSpawnedEventArgs
+            {
+                currentSpawnedPlatesAmount = currentSpawnedPlatesAmount
+            });
+            // DefaultNamespace.KitchenObject.SpawnKitchenObject(plateKitchenObjectItem, this);
         }
 
         public override void Interact(Player.Player player)
@@ -69,14 +89,27 @@ namespace Counters
             {
                 if (currentSpawnedPlatesAmount > 0)
                 {
-                    currentSpawnedPlatesAmount--;
                     KitchenObject.SpawnKitchenObject(plateKitchenObjectItem, player);
-                    OnPlateSpawned?.Invoke(this, new PlateSpawnedEventArgs
-                    {
-                        currentSpawnedPlatesAmount = currentSpawnedPlatesAmount
-                    });
+                    
+                    InteractServerRpc();
                 }
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void InteractServerRpc()
+        {
+            InteractClientRpc();
+        }
+
+        [ClientRpc]
+        private void InteractClientRpc()
+        {
+            currentSpawnedPlatesAmount--;
+            OnPlateSpawned?.Invoke(this, new PlateSpawnedEventArgs
+            {
+                currentSpawnedPlatesAmount = currentSpawnedPlatesAmount
+            });
         }
 
         private void HandleStateChanged(object sender, KitchenGameManager.StateChangedEventArgs e)
