@@ -61,6 +61,8 @@ namespace UI
             {
                 Destroy(KitchenGameLobbyManager.Instance.gameObject);
             }
+
+            Time.timeScale = 1;
         }
     }
 }

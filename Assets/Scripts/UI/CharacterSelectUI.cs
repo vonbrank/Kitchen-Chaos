@@ -39,7 +39,6 @@ namespace UI
 
         private void HandleMainMenuButtonClick()
         {
-            KitchenGameLobbyManager.Instance.FromLobbyGoBackToMainMenu();
             NetworkManager.Singleton.Shutdown();
             SceneLoader.Load(SceneLoader.Scene.MainMenuScene);
         }
