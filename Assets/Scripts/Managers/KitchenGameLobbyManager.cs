@@ -6,6 +6,7 @@ using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utils;
 using Random = UnityEngine.Random;
 
@@ -161,7 +162,8 @@ namespace Managers
             while (true)
             {
                 yield return new WaitForSeconds(refreshPeriod);
-                if (joinedLobby is null && AuthenticationService.Instance.IsSignedIn)
+                if (joinedLobby is null && AuthenticationService.Instance.IsSignedIn &&
+                    SceneManager.GetActiveScene().name == SceneLoader.Scene.LobbyScene.ToString())
                 {
                     ListLobbies();
                 }
@@ -221,6 +223,18 @@ namespace Managers
                 {
                     Debug.Log(e);
                 }
+            }
+        }
+
+        public void FromLobbyGoBackToMainMenu()
+        {
+            if (IsLobbyHost())
+            {
+                DeleteLobby();
+            }
+            else
+            {
+                LeaveLobby();
             }
         }
 
